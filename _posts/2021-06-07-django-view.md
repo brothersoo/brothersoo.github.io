@@ -8,7 +8,7 @@ tags:
   - MTV pattern
 ---
 
-** Django가 아닌 Django Rest Framework에 관련된 포스팅입니다.
+** Django가 아닌 Django Rest Framework에 관련된 포스팅입니다.\
 ** DRF를 사용하기 위해서는 pip install을 해주셔야 합니다.
 
 ## Django Rest Framework View
