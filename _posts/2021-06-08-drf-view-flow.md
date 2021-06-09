@@ -1,15 +1,11 @@
 ---
-title: "Django View(2) Flow"
+title: "DRF View(2) Flow"
 categories:
-  - Django
+  - Django Rest Framework
 tags:
   - DRF
-  - DRF view
-  - MTV pattern
+  - REST
 ---
-
-** Django가 아닌 Django Rest Framework에 관련된 포스팅입니다.\
-** DRF를 사용하기 위해서는 pip install을 해주셔야 합니다.
 
 ## DRF View의 흐름
 
@@ -31,7 +27,7 @@ urls.py에 설정한 SomeListAPIView의 endpoint를 GET method로 호출하게 �
 물론 python은 완전한 객체 지향 언어가 아니지만, 객체 지향스럽게 코딩을 할 수 있고, DRF의 view는 class based programming으로 짜여졌습니다.
 객체 지향 언어에 익숙하지 않았던 터라 상속받은 ListAPIView가 어떻게 생겼는지 확인할 생각을 하지 못했습니다.
 
-저는 mac os위에서 vs code로 코딩을 하야 cmd+좌클릭을 하면 해당 소스 코드를 확인할 수 있습니다.
+저는 mac os위에서 vs code로 코딩을 하여 cmd+좌클릭을 하면 해당 소스 코드를 확인할 수 있습니다.
 ListAPIView에 들어가보게 되면
 ```
 class ListAPIView(mixins.ListModelMixin,
@@ -72,7 +68,7 @@ class ListModelMixin:
 1. self.get_queryset()을 통한 queryset 가져오기
 2. Filtering 조건을 정의해놓았다면 queryset filtering 하기
 3. Filter된 queryset paginate 하기. Custom하게 정의한 pagination_class가 없다면 default pagination 진행.
-4. 
+4.
     1. Pagination의 결과가 있다면 queryset serialize 후 pagination 양식에 맞추어 response
     2. Pagination의 결과가 없다면 queryset serialize 후 response
 
