@@ -15,7 +15,7 @@ toc: true
 class Chef(models.Model):
     name = models.CharField()
     grade = models.IntegerField()
-    licences = models.ManyToMany('Licence')
+    licences = models.ManyToMany(Licence)
 
     class Meta:
         db_table = 'chef'

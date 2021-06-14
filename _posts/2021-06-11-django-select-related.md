@@ -149,3 +149,13 @@ select_related()는 정참조, 혹은 OneToOne 관계에서만 사용이 가능�
 Store 모델 클래스에 정의되어있는 ForeignKey 필드는 brand 뿐이니 당연하게도 menu를 찾지 못합니다.
 
 이러한 역참조 관계, 혹은 ManyToMany 관계에서 쿼리를 줄이기 위해 존재하는 것이 prefetch_related() 입니다.
+<br>
+<br>
+<br>
+<br>
+
+## 하하..
+
+지금 보니 Menu와 Chef가 One to One 관계에 있는것이 좀 이상하네요..
+
+한명의 Chef당 하나의 Menu만 책임지는 장인 동네라고 생각하겠습니다!
