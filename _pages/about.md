@@ -9,6 +9,8 @@ author_profile: true
 
 
 ## Interested in
+- Java
+- Spring
 - Algorithm
 - Python
 - Web Server / Backend
