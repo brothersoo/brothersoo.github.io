@@ -64,7 +64,7 @@ class Brand(models.Model):
 장고 shell을 켜고 위 ORM들을 실행한다면 실제 실행된 두개의 쿼리문을 콘솔에서 확인할 수 있습니다.
 
 1. \
-```SQL
+```sql
 SELECT
     "menu"."id",
     "menu"."name",
@@ -73,7 +73,7 @@ FROM
     "menu"
 ```
 2. \
-```SQL
+```sql
 SELECT
     "store"."id",
     "store"."name"

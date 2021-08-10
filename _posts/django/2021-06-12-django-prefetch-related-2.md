@@ -104,7 +104,7 @@ prefetch_realted를 사용하였을 때 실행되는 쿼리문의 수는 1 + (pr
 
 `Chef.objects.prefetch_related('licence')`의 실제 실행되는 쿼리문을 살펴보면 아래와 같습니다.
 
-```SQL
+```sql
 -- first query
 SELECT
     "chef"."id",
@@ -158,7 +158,7 @@ JOIN 연산은 db가 아닌 python이 진행한다고 했었는데 위 두번째
 
 위 두번째 sql의 INNER JOIN이 어떤 테이블간에 이루어지고 있는지를 확인해 보면 아래와 같은 것을 알 수 있습니다..
 
-```SQL
+```sql
 FROM
     "licence"
 INNER JOIN
@@ -227,13 +227,13 @@ Joinning이 이루어지고 있는 테이블은 licence 와 chef_licences입니�
 
 `Chef.objects.prefetch_related('licence')` 라는 코드를 실행했을 때의 쿼리를 보면 아래와 같은 WHERE IN clause가 발생하였고,
 
-```SQL
+```sql
 WHERE
     "chef_licences"."chef_id" IN (1, 2, 3, 4, 5, 6, 7)
 ```
 
 `Chef.objects.filter(grade=2).prefetch_related('licence')`라는 코드를 실행했을 때의 쿼리를 보면 아래와 같은 WHERE IN clause가 발생하였습니다.
-```SQL
+```sql
 WHERE
     "chef_licences"."chef_id" IN (1, 2, 3)
 ```
