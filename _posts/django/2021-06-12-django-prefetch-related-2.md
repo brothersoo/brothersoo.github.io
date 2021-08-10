@@ -7,6 +7,7 @@ tags:
   - query optimization
   - ORM
 toc: true
+permalink: /django/:title
 ---
 <br>
 # Simple example - 다대다 관계

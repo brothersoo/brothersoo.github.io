@@ -1,9 +1,10 @@
 ---
 title: "Parity bit"
 categories:
-  - Digital system
+  - cs
 tags:
   - error detection
+permalink: /computer_science/:title
 toc:
     true
 ---

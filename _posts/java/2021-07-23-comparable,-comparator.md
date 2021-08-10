@@ -5,6 +5,7 @@ categories:
 tags:
   - Java
   - sort
+permalink: /java/:title
 ---
 
 > Java의 comparable과 comparator를 너무나도 아름답게 잘 정리한 포스팅을 발견했습니다.

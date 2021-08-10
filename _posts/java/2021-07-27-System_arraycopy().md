@@ -5,6 +5,7 @@ categories:
 tags:
   - java
   - array
+permalink: /java/:title
 ---
 
 Python을 공부하다 Java를 공부하게 되면서 두려웠던 것이 참 많았습니다.

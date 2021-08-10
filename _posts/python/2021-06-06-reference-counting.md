@@ -5,6 +5,7 @@ categories:
   - Memory allocation
 tags:
   - Python
+permalink: /python/:title
 ---
 \
 Python은 C, C++과 같이 프로그래머가 직접 malloc(), calloc()과 같은 함수를 사용하여 메모리를 할당해주거나 해제해줄 필요가 없습니다.

@@ -6,6 +6,7 @@ tags:
   - Django
   - query optimization
   - ORM
+permalink: /django/:title
 ---
 <br>
 # Custom prefetch_related

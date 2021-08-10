@@ -4,6 +4,7 @@ categories:
   - Django Rest Framework
 tags:
   - DRF
+permalink: /django/:title
 ---
 
 ## save(), update() method

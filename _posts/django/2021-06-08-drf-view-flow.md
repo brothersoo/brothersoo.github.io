@@ -5,6 +5,7 @@ categories:
 tags:
   - DRF
   - REST
+permalink: /django/:title
 ---
 
 ## DRF View의 흐름

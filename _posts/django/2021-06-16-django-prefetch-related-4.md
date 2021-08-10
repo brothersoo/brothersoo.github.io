@@ -7,6 +7,7 @@ tags:
   - query optimization
   - ORM
 toc: true
+permalink: /django/:title
 ---
 
 <br>
