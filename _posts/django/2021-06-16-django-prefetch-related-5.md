@@ -29,7 +29,7 @@ permalink: /django/:title
 
 django.db.models.query의 Prefetch의 인자로 to_attr를 넘겨줄 수 있습니다.
 
-```
+```python
 from django.db.models.query import Prefetch
 
 
@@ -54,7 +54,7 @@ to_attr parameter를 넘겨주지 않고 prefetch 된 데이터를 사용하려�
 
 > parameter는 함수 혹은 클래스로 넘겨주는 인자의 변수명이고 argument는 넘겨주는 데이터를 뜻합니다.
 > ex)
-> ```
+> ```python
 > def some_function(*, param1, param2):
 >  print(param1, param2)
 >
@@ -67,7 +67,7 @@ to_attr parameter를 넘겨주지 않고 prefetch 된 데이터를 사용하려�
   <div markdown="1">
 
   > python3 부터 정의한 parameter들 중 * 이후에 쓰인 parameter들은 함수 호출시 반드시 parameter 이름을 표기해주어야 합니다.>>
-  > ```
+  > ```python
   > some_function(param1=arg1, param2=arg2)  # OK!
   > some_function(arg1, arg2)                # NG!
   > ```
@@ -85,7 +85,7 @@ to_attr parameter를 넘겨주지 않고 prefetch 된 데이터를 사용하려�
 
 실행 결과는 'list of 첫번째 Store가 가지고 있는 메뉴들'이 됩니다.
 
-```
+```python
 queryset = Store.objects.prefetch_related(
   Prefetch(
     'menu_set',

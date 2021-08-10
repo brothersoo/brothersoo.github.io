@@ -26,7 +26,7 @@ N 개의 추가 쿼리를 evaluate 해야 하는 문제입니다.
 
 한개의 Store은 한개 이상의 Menu를 가지고 있을 수 있습니다.
 
-```
+```python
 class Store(models.Model):
     name = models.CharField()
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
@@ -64,7 +64,7 @@ class Brand(models.Model):
 장고 shell을 켜고 위 ORM들을 실행한다면 실제 실행된 두개의 쿼리문을 콘솔에서 확인할 수 있습니다.
 
 1. \
-```
+```SQL
 SELECT
     "menu"."id",
     "menu"."name",
@@ -73,7 +73,7 @@ FROM
     "menu"
 ```
 2. \
-```
+```SQL
 SELECT
     "store"."id",
     "store"."name"
@@ -95,11 +95,13 @@ select_related()는 **"한번에 가져오기"**입니다. 어떻게 한번에 �
 
 store를 select_related에 포함한 사용법, 그리고 그에 해당하는 쿼리문은 아래와 같습니다.
 
-```
+```python
 # ORM
 first_menu = Menu.objects.select_related('store').get(id=1)
+```
 
-# SQL
+```SQL
+-- SQL
 SELECT
     "menu"."id",
     "menu"."name",

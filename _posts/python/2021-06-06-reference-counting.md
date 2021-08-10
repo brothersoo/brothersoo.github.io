@@ -14,7 +14,7 @@ Python은 C, C++과 같이 프로그래머가 직접 malloc(), calloc()과 같�
 ## Reference counting
 Reference counting은 말 그대로 어떤 객체가 다른 객체로부터 참조된 횟수를 세는 방식을 사용합니다. sys 모듈의 getrefcount()를 사용하면 객체의 참조된
 횟수를 구할 수 있습니다.
-```
+```python
 import sys
 
 
@@ -41,7 +41,7 @@ Reference count가 0이 되면 obj의 메모리 할당이 해제됩니다.
 
 Reference count는 매우 효과적이지만, 몇가지 경우는 정상적으로 메모리 해제를 하지 못합니다. 대표적인 경우로는 reference cycle이 일어나는 경우입니다.
 Reference cycle은 한개, 혹은 그 이상의 객체들이 서로를 참조하고 있는 상태를 말합니다.
-```
+```python
 # 예시 1
 a.attr = b
 b.attr = a

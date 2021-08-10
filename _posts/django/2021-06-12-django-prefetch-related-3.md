@@ -15,7 +15,7 @@ permalink: /django/:title
 
 예를 들어 Store에서 근무하는 요리사들을 모두 prefetch_related를 사용하여 한번에 불러올 때 요리사에도 특정 조건을 부여하고 싶은 경우도 있을 수 있습니다.
 
-```
+```python
 # Modeling
 
 class Chef(models.Model):
@@ -53,7 +53,7 @@ class Menu(models.Model):
         db_table = 'menu'
 ```
 
-```
+```python
 from django.db.models.query import Prefetch
 
 

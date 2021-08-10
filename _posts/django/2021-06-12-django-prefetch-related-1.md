@@ -62,7 +62,7 @@ select_related는 일대일 관계(One to One), 정참조 관계에서 사용됩
 
 # Simple example - 역참조
 
-```
+```python
 class Chef(models.Model):
     name = models.CharField()
     grade = models.IntegerField()
@@ -84,7 +84,7 @@ class Store(models.Model):
 
 이때, 성동구 혹은 마포구에 위치한 가게를 불러오되, 그 가게들에서 일하고 있는 요리사들을 earger loading 하고 싶다면 아래와 같이 작성해주시면 됩니다.
 
-```
+```python
 Store.objects.filter(address__in=['성동구', '마포구']).prefetch_related('chef_set')
 ```
 <br>

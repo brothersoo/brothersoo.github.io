@@ -11,7 +11,7 @@ permalink: /django/:title
 ## DRF View의 흐름
 
 정말 간단한 ListAPIView의 예시를 하나 작성해보자면
-```
+```python
 from rest_framework import generics
 
 class SomeListAPIView(generics.ListAPIView):
@@ -30,7 +30,7 @@ urls.py에 설정한 SomeListAPIView의 endpoint를 GET method로 호출하게 �
 
 저는 mac os위에서 vs code로 코딩을 하여 cmd+좌클릭을 하면 해당 소스 코드를 확인할 수 있습니다.
 ListAPIView에 들어가보게 되면
-```
+```python
 class ListAPIView(mixins.ListModelMixin,
                   GenericAPIView):
     """
@@ -44,7 +44,7 @@ class ListAPIView(mixins.ListModelMixin,
 get() 메서드만 있으니 GET method만 사용하여 api를 호출할 수 있습니다.
 
 그렇다면 self.list()는 어떻게 생겼나 보기 위해 들어가보면,
-```
+```python
 class ListModelMixin:
     """
     List a queryset.

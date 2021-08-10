@@ -15,7 +15,7 @@ CreateAPIView 혹은 UpdateAPIView를 사용한다면 생성 혹은 수정 작�
 
 Create의 예시로 CreateAPIView와 그가 상속받는 CreateModelMixin의 소스를 확인한다면 아래와 같은 코드를 확인할 수 있습니다.
 
-```
+```python
 class CreateAPIView(mixins.CreateModelMixin,
                     GenericAPIView):
     """
@@ -25,7 +25,7 @@ class CreateAPIView(mixins.CreateModelMixin,
         return self.create(request, *args, **kwargs)
 ```
 
-```
+```python
 class CreateModelMixin:
     """
     Create a model instance.

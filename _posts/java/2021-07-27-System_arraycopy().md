@@ -83,7 +83,7 @@ Arrays.asList가 가변 길이의 list를 생성해주는데 어떤 추가 단�
 `srcPos`부터 `length`개의 데이터가 복사될 것입니다.
 
 짧은 예를 만들어보면, 아래와 같습니다.
-```
+```java
 public static void main(String[] args) {
   int[] arrayOne = new int[]{1, 2, 3, 4, 5};
   int[] arrayTwo = new int[arrayOne.length];
@@ -116,7 +116,7 @@ c, 혹은 다른 언어로 작성된 라이브러리를 사용할 수 있게 해
 
 대강 확인해보니 가장 중요한 부분은 _Copy_conjoint_jlongs_atomic() 메서드라고 생각이 듭니다.
 
-```
+```java
 void _Copy_conjoint_jlongs_atomic(jlong* from, jlong* to, size_t count) {
   if (from > to) {
     jlong *end = from + count;
@@ -187,7 +187,7 @@ k는 `src[srcPos + k]`가 `dest`에 삽입될 수 없는 타입일 경우의 값
 
 ### ArrayStoreException
 
-```
+```java
 public static void main(String[] args) {
   Object[] wowArray = new Object[]{1, 2, 3, "4", "5"};
   Integer[] integerArray = new Integer[5];

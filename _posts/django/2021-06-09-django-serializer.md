@@ -19,7 +19,7 @@ Serializing 뿐만이 아닌 deserializing도 가능합니다.
 
 아래 코드는 serializer의 간단한 예제입니다.
 
-```
+```python
 from rest_framework import serializers
 
 class CommentSerializer(serializers.Serializer):
@@ -30,7 +30,7 @@ class CommentSerializer(serializers.Serializer):
 
 이후 View에서 아래와 같은 코드를 수행하게 된다면 표기된 형식의 데이터를 얻을 수 있습니다.
 
-```
+```python
 serializer = CommentSerializer(comment)
 serializer.data
 

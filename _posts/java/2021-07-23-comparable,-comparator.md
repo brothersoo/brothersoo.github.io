@@ -41,7 +41,7 @@ Comparable을 상속받을때 필수로 overriding 해주어야 하는 메서드
 
 만약 메뉴의 가격을 비교하고자 한다면 아래와 같은 Menu 클래스에 Comparable을 상속받고 compareTo()를 overriding하면 됩니다.
 
-```
+```java
 class Menu implements Comparable<Menu> {
 
   Long id;
@@ -63,7 +63,7 @@ class Menu implements Comparable<Menu> {
 
 이렇게 Menu class에 compareTo를 구현하면 Menu끼리 가격으로 손쉽게 비교를 할 수 있습니다.
 
-```
+```java
 public static void main(String[] args) {
 
   Menu a = new Menu(1L, "돈까스", 8000);
@@ -79,7 +79,7 @@ public static void main(String[] args) {
 
 한가지 요소로만 단순 비교하지 않는다면 compareTo()를 요리조리킹 잘 조작하시면 됩니다.
 
-```
+```java
 class Menu implements Comparable<Menu> {
 
   Long id;
@@ -123,7 +123,7 @@ Menu의 어떤 값을 기준으로 정렬할 것인지를 모르니 에러가 �
 
 하지만 저희는 멋진 기준을 가지고 compareTo() 메서드를 재정의 해주었으니 Collections.sort()를 사용할 수 있게 되었습니다!
 
-```
+```java
 List<Menu> menuList = new ArrayList<>();
 menuList.add(new Menu(1L, "파전", 8000));
 menuList.add(new Menu(2L, "사탕", 200));
@@ -154,7 +154,7 @@ Collections.sort(menuList);
 
 간단하게 람다 함수를 써주어도 great입니다!
 
-```
+```java
 List<Menu> menuList = new ArrayList<>();
 menuList.add(new Menu(1L, "돈까스", 8000));
 menuList.add(new Menu(2L, "사탕", 200));
@@ -252,7 +252,7 @@ integer는 -2,147,483,649를 표현할 수 없기 때문이죠.
 
 대부분의 경우에서는 이 범위를 넘어가지 않겠지만 혹시 이러한 경우가 생길 수 있다면 빼기 연산을 반환하는 것이 아닌 비교 연산 후 조건에 따라 정확하게 1, 0, -1을 반환해 주는 것이 좋다고 합니다.
 
-```
+```java
 menuList.add(new Menu(1L, "돈까스", -2,147,483,648));
 menuList.add(new Menu(2L, "사탕", 1));
 
@@ -269,7 +269,7 @@ Collections.sort(menuList, (Menu m1, Menu m2) -> {
 
 그러니 정확한 비교를 위해서는 아래와 같이 작성해야 합니다.
 
-```
+```java
 Collections.sort(menuList, (Menu m1, Menu m2) -> {
       if (m1.price > m2.price) {
         return 1;

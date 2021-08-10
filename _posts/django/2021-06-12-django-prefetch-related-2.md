@@ -12,7 +12,7 @@ permalink: /django/:title
 <br>
 # Simple example - 다대다 관계
 
-```
+```python
 class Chef(models.Model):
     name = models.CharField()
     grade = models.IntegerField()
@@ -35,13 +35,13 @@ Chef와 Licence를 보면 한명의 요리사는 여러개의 자격증을 가�
 
 등급이 3등급인 요리사들이 가지고 있는 자격증의 데이터까지 한번에 가져오고 싶다면 아래와 같이 작성하면 됩니다.
 
-```
+```python
 Chef.obejcts.filter(grade=3).prefetch_related('licence')
 ```
 
 반대로 어려움 등급이 2등급인 자격증을 가지고 있는 요리사의 데이터를 한번에 가져오고 싶다면 아래와 같이 작성하면 됩니다.
 
-```
+```python
 Licence.objects.filter(difficulty=2).prefetch_related('chef_set')
 ```
 
@@ -57,7 +57,7 @@ Licence.objects.filter(difficulty=2).prefetch_related('chef_set')
 
 각 요리사의 자격들을 포함한 요리사들의 리스트를 불러오는 ChefListAPIView api를 예시로 들어보겠습니다.
 
-```
+```python
 class ChefListAPIView(generics.ListAPIView):
     queryset = Chef.objects.all()
     serializer_class = ChefListSerializer
@@ -104,7 +104,7 @@ prefetch_realted를 사용하였을 때 실행되는 쿼리문의 수는 1 + (pr
 
 `Chef.objects.prefetch_related('licence')`의 실제 실행되는 쿼리문을 살펴보면 아래와 같습니다.
 
-```
+```SQL
 -- first query
 SELECT
     "chef"."id",
@@ -158,7 +158,7 @@ JOIN 연산은 db가 아닌 python이 진행한다고 했었는데 위 두번째
 
 위 두번째 sql의 INNER JOIN이 어떤 테이블간에 이루어지고 있는지를 확인해 보면 아래와 같은 것을 알 수 있습니다..
 
-```
+```SQL
 FROM
     "licence"
 INNER JOIN
@@ -227,13 +227,13 @@ Joinning이 이루어지고 있는 테이블은 licence 와 chef_licences입니�
 
 `Chef.objects.prefetch_related('licence')` 라는 코드를 실행했을 때의 쿼리를 보면 아래와 같은 WHERE IN clause가 발생하였고,
 
-```
+```SQL
 WHERE
     "chef_licences"."chef_id" IN (1, 2, 3, 4, 5, 6, 7)
 ```
 
 `Chef.objects.filter(grade=2).prefetch_related('licence')`라는 코드를 실행했을 때의 쿼리를 보면 아래와 같은 WHERE IN clause가 발생하였습니다.
-```
+```SQL
 WHERE
     "chef_licences"."chef_id" IN (1, 2, 3)
 ```

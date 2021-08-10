@@ -37,7 +37,7 @@ permalink: /django/:title
 위 링크의 내용을 간략하게 설명한다면, queryset은 무작정 캐싱되지 않습니다. queryset 객체를 생성하고 그 객체를 다시 불러올때 비로소 그 객체에 캐싱된
 데이터를 불러오게 됩니다.
 
-```
+```python
 # 위 print문과 아래 print문에서 사용된 Menu queryset은 별개이므로 queryset 캐싱의 이점을 전혀 활용하지 못했습니다.
 print([menu.name for menu in Menu.objects.all()])    # hits DB!
 print([menu.price for menu in Menu.objects.all()])   # hits DB!
@@ -61,7 +61,7 @@ print([menu.price for menu in queryset]) # Cache의 데이터를 사용!
 
 **View**
 
-```
+```python
 class StoreAPIView(generics.RetrieveAPIView):
   queryset = Store.objects.prefetch_related(
     Prefetch(
@@ -74,7 +74,7 @@ class StoreAPIView(generics.RetrieveAPIView):
 
 **Serializer**
 
-```
+```python
 class StoreSerializer(serializers.ModelSerialzier):
   avg_menu_price = serializers.SerializerMethodField()
 
