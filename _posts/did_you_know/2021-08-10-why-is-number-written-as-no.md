@@ -2,7 +2,7 @@
 title: "Number의 약자로 no.를 사용하는 이유는?"
 categories:
   - Did you know?
-permalink: /did you know/:title
+permalink: /did_you_know/:title
 ---
 
 <br>
