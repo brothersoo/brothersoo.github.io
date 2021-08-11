@@ -6,7 +6,7 @@ tags:
   - graph
   - shortest path
 toc: true
-permalink: /computer_science/:title
+permalink: /algorithm/:title
 ---
 <br>
 
@@ -50,7 +50,7 @@ if ((S -> M) + (M -> N) < S -> N):
 # 시간복잡도
 
 <details>
-<summary>아직 공부가 더 필요합니다^^; 이해가 잘 안되는 부분이 너무 많네요^^*</summary>
+<summary>아직 공부가 더 필요합니다^^; 이해가 잘 안되는 부분이 너무 많네요^^* (보지마세요! 잘못된 내용이 그득합니다!)</summary>
 <div markdown="1">
 
 
