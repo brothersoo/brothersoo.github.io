@@ -62,7 +62,7 @@ Arrays.asList가 가변 길이의 list를 생성해주는데 어떤 추가 단�
 
 # System.arraycopy()
 
-`System.arraycopy()`는 총 디섯가지 필수 parameter를 가집니다.
+`System.arraycopy()`는 총 다섯가지 필수 parameter를 가집니다.
 
 순서대로 `Object src`, `int srcPos`, `Object dest`, `int destPos`, `int length`가 되겠습니다.
 
@@ -135,7 +135,7 @@ void _Copy_conjoint_jlongs_atomic(jlong* from, jlong* to, size_t count) {
 
 뭐 이런 느낌으로 작동하는 것 같네요^^*~~사실 잘 모릅니다.~~
 
-document를 확인하니 src와 dest가 동일한 배열 객체를 참조하고 있는 경우에는 마치 다음과 같이 작동한다고 합니다.
+document를 확인하니 src와 dest가 동일한 배열 객체를 참조하고 있는 경우에는 마치 다음("as if")과 같이 작동한다고 합니다.
 
 1. `src` 배열의 `srcPos` 인덱스부터 `srcPos + length - 1` 인덱스의 값들이 `length` 만큼의 길이를 가지는 temp 배열에 복사된 후
 2. temp 배열을 `dest` 배열(`src`와 동일)의 `destPos` 인덱스부터 `destPos + length - 1` 인덱스까지 대입합니다.
