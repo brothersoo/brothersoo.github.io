@@ -253,7 +253,7 @@ integer는 -2,147,483,649를 표현할 수 없기 때문이죠.
 대부분의 경우에서는 이 범위를 넘어가지 않겠지만 혹시 이러한 경우가 생길 수 있다면 빼기 연산을 반환하는 것이 아닌 비교 연산 후 조건에 따라 정확하게 1, 0, -1을 반환해 주는 것이 좋다고 합니다.
 
 ```java
-menuList.add(new Menu(1L, "돈까스", -2,147,483,648));
+menuList.add(new Menu(1L, "돈까스", -2_147_483_648));
 menuList.add(new Menu(2L, "사탕", 1));
 
 Collections.sort(menuList, (Menu m1, Menu m2) -> {
