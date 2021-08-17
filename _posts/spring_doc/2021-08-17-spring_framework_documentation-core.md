@@ -7,9 +7,6 @@ tags:
 toc: true
 permalink: /spring_doc/:title
 ---
-<style>
-img + em { }
-</style>
 
 <br>
 
@@ -80,7 +77,7 @@ Spring에서 당신의 애플리케이션의 중추를 이루고 Spring IoC cont
 
 아래 다이어그램은 Spring이 어떻게 작동하는지 상위 단계의 관점으로 보여줍니다. 당신의 애플리케이션 클래스들은 configuration metadata로 결합되어있으므로, `ApplicationContext`가 생성되고 초기화된다면, 완전히 구성되고, 실행 가능한 시스템, 혹은 애플리케이션을 사용할 준비가 된 것입니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/spring_doc/core/container-magic.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/spring_doc/core/container-magic.png)\
 *그림 1. The Spring IoC container*
 
 ### 1.2.1. Configuration Metadata
