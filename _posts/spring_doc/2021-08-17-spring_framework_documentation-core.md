@@ -40,18 +40,16 @@ AspectJ(현재로써 기능면에서 가장 풍부하고, 확실히 Java enterpr
 ## 1.1. Spring IoC Container와 Beans에 대한 설명
 
 이번 절은 Spring Framework의 `역전의 제어` 원칙의 구현을 다룹니다. IoC는 의존성 주입(Dependency injection, 이하 DI)라고도 불립니다. 이는 객체들이 그들의 의존성(: 함께 작동할 다른 객체)을 오직
-1. 생산자 인자(Constructor argument),
-2. factory method로의 인자,
-3. 생성되거나 factory method로부터 반환된 객체에 설정된 속성값
+
+생산자 인자(Constructor argument), factory method로의 인자, 혹은 생성되거나 factory method로부터 반환된 객체에 설정된 속성값
 
 을 통해서만 정의하는 과정입니다. Container가 의존성을 가질 Bean 객채를 생성 후 해당 의존성을 주입합니다. 이 과정은 근본적으로
-1. 클래스의 direct construction
-2. `Service Locator pattern`
 
-과 같은 메커니즘
-을 통해 bean이 역으로 그의
-1. 인스턴스화
-2. 의존성의 위치
+클래스의 direct construction와 `Service Locator pattern`
+
+과 같은 메커니즘을 통해 bean이 역으로 그의
+
+인스턴스화와 의존성의 위치
 
 를 역으로 제어하는 것입니다(역전의 제어라는 이름을 보면 알다시피).
 
