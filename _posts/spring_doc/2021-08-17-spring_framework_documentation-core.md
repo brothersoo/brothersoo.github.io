@@ -275,7 +275,15 @@ Spring IoC 컨테이너는 하나 이상의 bean을 관리합니다. 이 bean들
 
 특정 bean을 생성하는 방법에 대한 설명을 가지고 있는 bean definition에 대해 추가적인 정보로, `ApplicationContext` 구현체들은 사용자들에 의해 컨테이너 외부에서 생성되어 존재하는 객체들의 등록을 허용합니다. 이는 BeanFactory의 `DefaultListableBeanFactory` 구현체를 반환하는 `getBeanFactory()` 메서드를 통해 ApplicationContext의 BeanFactory에 접근하는 것으로 행해집니다. `DefaultListableBeanFactory`는 `registerSingleton(..)`과 `registerBeanDefinition(..)` 메서드를 통해 해당 등록을 지원합니다. 그러나 일반적으로 애플리케이션들은 표준 bean definition 메타데이터를 통해 정의된 beans으로만 작동합니다.
 
-> **_INFO:_** Bean 메타데이터와 수동으로 제공된 싱글톤 객체들은, 컨테이너가 autowiring과 다른 내부 조사(introspect) 단계들에서 컨테이너가 그들을 원활히 이해(reason about)하기 위해 최대한 빨리 등록되어야 합니다. 어느 정도에서는 이미 존재하는 메타데이터와 싱글톤 인스턴스들을 오버라이딩 하는 것이 지원되지만, 런타임 환경에서 새로운 bean 등록은 공식적으로 지원되지 않고, 동시적 접근 예외(concurrent access exceptions), bean 컨테이너 내의 일관적이지 않은 상태, 혹은 둘 다를 야기할 수 있습니다.
+<div class="info-box" style="height: 200px;">
+    <div class="info-icon">
+        <div class="icon-div"><div class="icon"></div></div>
+    </div>
+    <div class="info-content">
+        Bean 메타데이터와 수동으로 제공된 싱글톤 객체들은, 컨테이너가 autowiring과 다른 내부 조사(introspect) 단계들에서 컨테이너가 그들을 원활히 이해(reason about)하기 위해 최대한 빨리 등록되어야 합니다. 어느 정도에서는 이미 존재하는 메타데이터와 싱글톤 인스턴스들을 오버라이딩 하는 것이 지원되지만, 런타임 환경에서 새로운 bean 등록은 공식적으로 지원되지 않고, 동시적 접근 예외(concurrent access exceptions), bean 컨테이너 내의 일관적이지 않은 상태, 혹은 둘 다를 야기할 수 있습니다.
+    </div>
+</div>
+
 
 ### <a name="beans-beanname"></a>1.3.1. Bean 이름 짓기
 
