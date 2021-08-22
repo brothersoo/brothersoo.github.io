@@ -26,12 +26,18 @@ permalink: /spring_doc/:title
         color: #00473E;
     }
     .info-icon {
-        align: center;
+        text-align: center;
         width: 10%;
         float: left;
     }
-    .info-icon.icon {
+    .icon-div {
+        display: table-call;
+        vertical-align: middle;
+    }
+    .icon {
         content: url({{ site.url }}{{ site.baseurl }}/assets/images/spring_doc/info-icon.png);
+        width: 50%;
+        height: 50%;
     }
     .info-content {
         width: 90%;
@@ -117,7 +123,7 @@ Spring에서 당신의 애플리케이션의 중추를 이루고 Spring IoC cont
 
 <div class="info-box" style="height: 120px;">
     <div class="info-icon">
-        <div class="icon"></div>
+        <div class="icon-div"><div class="icon"></div></div>
     </div>
     <div class="info-content">
         XML 기반 메타데이터는 구성 메타데이터를 작성하는데 허용된 유일한 형식이 아닙니다. Spring IoC 컨테이너는 이 구성 메타데이터가 실제 어떤 형식으로 쓰여있는지와 아무런 관계가 없습니다. 요즘 많은 개발자들은 그들의 Spring 애플리케이션에 <a href="#beans-java">Java 기반 configuration</a>을 선택합니다.
