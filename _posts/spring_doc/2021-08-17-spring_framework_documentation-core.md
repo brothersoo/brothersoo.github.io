@@ -31,7 +31,7 @@ permalink: /spring_doc/:title
         float: left;
     }
     .info-icon.icon {
-        content: url(![]({{ site.url }}{{ site.baseurl }}/assets/images/spring_doc/info-icon.png));
+        content: url({{ site.url }}{{ site.baseurl }}/assets/images/spring_doc/info-icon.png);
     }
     .info-content {
         width: 90%;
