@@ -16,6 +16,13 @@ permalink: /spring_doc/:title
         padding: 20px;
         height: auto;
     }
+    .blue-text-box a {
+        color: #00473E;
+    }
+    .blue-text-box code {
+        background-color: #4C4C69;
+        color: white;
+    }
     .info-box {
         color: #242424;
         background-color: #AEC0AE;
@@ -72,11 +79,11 @@ AspectJ(현재로써 기능면에서 가장 풍부하고, 확실히 Java enterpr
 
 # 1. The IOC Container
 
-이번 절은 Spring의 역전의 제어(이하 IoC) container에 대해 다룹니다.
+이번 장은 Spring의 역전의 제어(이하 IoC) container에 대해 다룹니다.
 
 ## 1.1. Spring IoC Container와 Beans에 대한 설명
 
-이번 절은 Spring Framework의 `역전의 제어` 원칙의 구현을 다룹니다. IoC는 의존성 주입(Dependency injection, 이하 DI)라고도 불립니다. 이는 객체들이 그들의 의존성(: 함께 작동할 다른 객체)을 오직
+이번 장은 Spring Framework의 `역전의 제어` 원칙의 구현을 다룹니다. IoC는 의존성 주입(Dependency injection, 이하 DI)라고도 불립니다. 이는 객체들이 그들의 의존성(: 함께 작동할 다른 객체)을 오직
 
 생산자 인자(Constructor argument), factory method로의 인자, 혹은 생성되거나 factory method로부터 반환된 객체에 설정된 속성값
 
@@ -98,7 +105,7 @@ AspectJ(현재로써 기능면에서 가장 풍부하고, 확실히 Java enterpr
 - 이벤트 게시(Event publisher)
 - `WebApplicationContext`와 같은 웹 애플리케이션에서 사용할 수 있는 `Application-layer specific contexts`
 
-다시말해, `BeanFactory`는 configuration 프레임워크와 기본 기능을 제공하고, `ApplicationContext`는 엔터프라이즈에 특화된 기능이 추가된 것입니다. `ApplicationContext`는 `BeanFactory`의 완전한 상위 대체자(superset)이고, 이번 절에서 Spring의 IoC Container를 설명하는데 항상 사용될 것입니다. `ApplicationContext` 대신 `BeanFactory`의 사용에 대한 설명은 [The `BeanFactory`](#beans-beanfactory)를 확인하세요.
+다시말해, `BeanFactory`는 configuration 프레임워크와 기본 기능을 제공하고, `ApplicationContext`는 엔터프라이즈에 특화된 기능이 추가된 것입니다. `ApplicationContext`는 `BeanFactory`의 완전한 상위 대체자(superset)이고, 이번 장에서 Spring의 IoC Container를 설명하는데 항상 사용될 것입니다. `ApplicationContext` 대신 `BeanFactory`의 사용에 대한 설명은 [The `BeanFactory`](#beans-beanfactory)를 확인하세요.
 
 Spring에서 당신의 애플리케이션의 중추를 이루고 Spring IoC container에 의해 관리될 객체들은 `Bean`이라 불립니다. `Bean`은 Spring IoC container에 의해 인스턴스화(이하 구현)되고, 조립되고, 관리될 객체입니다. 그렇지 않다면, bean은 당신의 애플리케이션 안에 있는 수많은 평범한 객체중 하나에 불과하지 않을 것입니다. Bean과 그에 대한 의존성들(dependencies)은 container이 사용하는 configuration metadata에 반영되어있습니다.
 
@@ -316,7 +323,54 @@ XML 기반 구성 메타데이터에서, `id` 속성, `name` 속성, 혹은 둘 
 
 Bean definition 자체 내에서, `id`속성으로 지정된 하나의 이름과, `name` 속성으로 지정된 원하는 만큼의 이름들의 조합을 통해, bean에게 하나 이상의 이름을 제공할 수 있습니다. 
 
+그러나, bean이 실제로 정의되어있는 곳에 별칭을 부여하는 것이 항상 올바르지는 않을 수 있습니다. 다른 곳에서 정의된 bean의 별칭을 부여해야 하는 상황이 있을 때가 있습니다. 이는 보통, 각각 고유한 객체 정의문을 가지고 있는 서브-시스템을 여러개 가지고 있는 거대한 시스템의 configuration이 각 서브-시스템마다 있는 경우입니다. XML 기반 구성 메타데이터에서는, `<alias/>` 요소로 이를 해결할 수 있습니다.
+
+```xml
+<alias name="fromName" alias="toName"/>
+```
+
+이 경우에, 위 별칭 정의가 이루어진 후에는 `fromName`이라고 이름지어진 bean(같은 컨테이너 내의)이 `toName`으로 지칭될 수 있습니다.
+
+예를 들어, 서브-시스템 A의 구성 메타데이터는 `subsystemA-dataSource`라는 이름으로 DataSource를 참조할 수 있습니다. 또, 서브-시스템 B의 구성 메타데이터는 `subsystemB-datasource`라는 이름으로 DataSource를 참조할 수 있습니다. 위 서브-시스템 A와 B를 모두 사용하는 메인 애플리케이션을 구성할 때, 이 메인 애플리케이션은 `myApp-dataSource`라는 이름으로 DataSource를 참조합니다. 이와 같이 다른 세가지 이름으로 하나의 객체를 참조하고 싶다면, 구성 메타데이터에 아래와 같은 별칭 정의를 추가하면 됩니다.
+
+```xml
+<alias name="myApp-dataSource" alias="subsystemA-dataSource"/>
+<alias name="myApp-dataSource" alias="subsystemB-dataSource"/>
+```
+
+이제 각 component와 메인 애플리케이션은, 유일하고, 같은 bean을 참조하면서도 다른 정의와 충돌을 일으키지 않을 것임을 보장하는 이름으로, DataSource를 참조할 수 있습니다.
+
+<div class="blue-text-box">
+<p style="text-align: center; font-size: 20px">Java-configuration</p>
+
+<p>만약 Javaconfiguration을 사용한다면, 별칭을 제공하기 위해 `@Bean` 어노테이션을 사용할 수 있습니다. 자세한 내용은 <a href="#beans-java-bean-annotation"><code>@Bean</code> 어노테이션 사용하기</a>에서 확인하세요</p>
+</div>
+
 ### <a name="beans-factory-class"></a>1.3.2. Bean 인스턴스화하기
+
+Bean definition은 하나 이상의 객체를 생성하는데 필수적인 생성 문서입니다. 컨테이너는 이름 있는 bean이 그의 이름으로 요청될 때 이 문서를 읽고, 실제 객체를 생성(혹은 획득)하기 위해 bean definition에 의해 캡슐화된 구성 메타데이터를 사용합니다.
+
+만약 XML 기반 구성 메타데이터를 사용한다면, `<bean/>` 요소의 `class` 속성에 인스턴스화 될 객체의 타입(혹은 클래스)를 지정합니다. 이 `class` 속성(내부적으로 `BeanDefinition`의 `Class` 프로퍼티)은 보통 필수적입니다. (예외 경우는 [인스턴스 팩토리 메서드로 인스턴스화하기](#beans-factory-class-instance-factory-method), 그리고 [Bean definition 상속화](#beans-child-bean-definitions)에서 확인하세요.) `Class` 프로퍼티는 다음 두가지 경우 중 하나의 경우로써 지정될 수 있습니다.
+
+- 보통, (`new` 연산자를 사용하는 Java 코드와 다소 동등하게도), 컨테이너가 스스로 bean의 생성자를 반사적으로 호출하여 bean을 생성할 때, bean 클래스가 생성되기를 지정.
+- 컨테이너가 bean을 생성하기 위해 클래스의 `static` 팩토리 메서드를 호출하는 경우보다 적은 경우인, 객체를 생성하기 위해 호출된 `static` 팩토리 메서드를 포함하는 실제 클래스를 지정. `static` 팩토리 메서드의 호출으로부터 반환된 객체 타입은 같은 클래스 일 수도 있고, 완전히 다른 클래스 일 수도 있습니다.
+
+<div class="blue-text-box">
+<p style="text-align: center; font-size: 20px">중첩된 클래스명</p>
+
+<p>중첩된 클래스에 대한 bean definition을 구성하고 싶다면, 중첩된 클래스의 이진명(binary name), 혹은 소스명(source name) 중 하나를 사용하시면 됩니다.</p>
+
+<p>예를 들어, <code>com.example</code>안에 <code>SomeThing</code>이라는 클래스가 있고, 이 <code>SomeThing</code> 클래스는 <code>OtherThing</code>이라는 <code>static</code> 중첩 클래스를 가지고 있다면, 그들은 달러 표시(<code>$</code>) 혹은 점(<code>.</code>)으로 분리될 수 있습니다. 따라서 bean definition 안의 `class` 속성의 값은 `com.example.SomeThing$OtherThing` 혹은 `com.example.SomeThing.OtherThing`이 될 것입니다.</p>
+
+</div>
+
+#### 생성자로 인스턴스화하기
+
+#### 정적 팩토리 메서드로 인스턴스화하기
+
+#### <a name="beans-factory-class-instance-factory-method"></a>인스턴스 팩토리 메서드로 인스턴스화하기
+
+#### Bean의 런타임 타입 검사하기
 
 ## <a name="beans-dependencies"></a>1.4. Dependencies (의존성)
 
@@ -364,10 +418,14 @@ Bean definition 자체 내에서, `id`속성으로 지정된 하나의 이름과
 
 #### <a name="beans-factory-lifecycle-disposablebean"></a>Destruction Callbacks
 
+## <a name="beans-child-bean-definitions"></a>1.7 Bean definition 상속
+
 ## <a name="beans-annotation-config"></a>1.9. 어노테이션 기반 컨테이너 설정
 
 
 ## <a name="beans-java"></a>1.12. 자바 기반의 컨테이너 설정
+
+### <a name="beans-java-bean-annotation"></a>1.12.3. `@Bean` 어노테이션 사용하기
 
 ### <a name="context-create"></a>1.15.5. 웹 애플리케이션을 위한 간편한 ApplicationContext 인스턴스화
 
