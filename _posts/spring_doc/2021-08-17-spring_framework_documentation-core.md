@@ -360,11 +360,25 @@ Bean definition은 하나 이상의 객체를 생성하는데 필수적인 생�
 
 <p>중첩된 클래스에 대한 bean definition을 구성하고 싶다면, 중첩된 클래스의 이진명(binary name), 혹은 소스명(source name) 중 하나를 사용하시면 됩니다.</p>
 
-<p>예를 들어, <code>com.example</code>안에 <code>SomeThing</code>이라는 클래스가 있고, 이 <code>SomeThing</code> 클래스는 <code>OtherThing</code>이라는 <code>static</code> 중첩 클래스를 가지고 있다면, 그들은 달러 표시(<code>$</code>) 혹은 점(<code>.</code>)으로 분리될 수 있습니다. 따라서 bean definition 안의 `class` 속성의 값은 `com.example.SomeThing$OtherThing` 혹은 `com.example.SomeThing.OtherThing`이 될 것입니다.</p>
+<p>예를 들어, <code>com.example</code>안에 <code>SomeThing</code>이라는 클래스가 있고, 이 <code>SomeThing</code> 클래스는 <code>OtherThing</code>이라는 <code>static</code> 중첩 클래스를 가지고 있다면, 그들은 달러 표시(<code>$</code>) 혹은 점(<code>.</code>)으로 분리될 수 있습니다. 따라서 bean definition 안의 <code>class</code> 속성의 값은 <code>com.example.SomeThing$OtherThing</code> 혹은 <code>com.example.SomeThing.OtherThing</code>이 될 것입니다.</p>
 
 </div>
 
 #### 생성자로 인스턴스화하기
+
+생성자를 사용하여 bean을 생성할 경우에, 모든 일반 클래스들은 Spring이 사용 가능하고, 호환이 가능하게 됩니다. 그 말인 즉슨, 개발되는 클래스는 아무런 인터페이스를 상속받지 않아도 되고, 특정한 방식으로 코드가 짜여야 한다는 법도 없습니다. 단순히 bean 클래스를 지정하는것만으로 충분합니다. 그러나, 해당 bean에 어떠한 타입의 IoC를 사용하냐에 따라, default(비어있는) 생성자가 필요할 수도 있습니다.
+
+Spring IoC 컨테이너는 사실상 원하는 어떠한 클래스든 관리할 수 있습니다. True JavaBean들만 한정되게 관리할 수 있는 것이 아닙니다. 대부분의 Spring 사용자들은 컨테이너 안에서 properties를 따라 구상된 default(인자 없는) 생성자와 적절한 setters와 getters만을 가지는 실제 JavaBeans를 선호합니다. 컨테이너는 더 외부적인 non-bean-style의 클래스들을 가질 수 있습니다. 만약 예를 들어, JavaBean 명세를 전혀 지키지 않는 레거시 connection pool을 사용해야 한다 하더라도, Spring은 그것 또한 관리할 수 있습니다.
+
+XML 기반 구성 메타데이터에서 다음과 같이 bean 클래스를 명세할 수 있습니다.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean"/>
+
+<bean name="anotherExample" class="examples.ExampleBeanTwo"/>
+```
+
+생성자에 인자를 전달하는 메커니즘(필요하다면), 그리고 객체가 생성된 후에 객체 인스턴스 속성을 관리하는 것에 대한 자세한 내용은 [의존성 주입](#beans-factory-collaborators)을 확인하세요.
 
 #### 정적 팩토리 메서드로 인스턴스화하기
 

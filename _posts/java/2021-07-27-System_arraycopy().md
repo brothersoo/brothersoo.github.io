@@ -5,6 +5,7 @@ categories:
 tags:
   - java
   - array
+  - sonar lint
 permalink: /java/:title
 ---
 
