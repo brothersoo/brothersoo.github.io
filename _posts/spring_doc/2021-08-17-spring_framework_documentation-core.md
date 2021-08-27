@@ -380,17 +380,130 @@ XML 기반 구성 메타데이터에서 다음과 같이 bean 클래스를 명�
 
 생성자에 인자를 전달하는 메커니즘(필요하다면), 그리고 객체가 생성된 후에 객체 인스턴스 속성을 관리하는 것에 대한 자세한 내용은 [의존성 주입](#beans-factory-collaborators)을 확인하세요.
 
-#### 정적 팩토리 메서드로 인스턴스화하기
+#### <a name="beans-factory-class-static-factory-method"></a>정적 팩토리 메서드로 인스턴스화하기
+
+정적 팩토리 메서드를 통해 생성하는 bean을 정의할때는 아래 두 속성을 사용하세요.
+
+1. `class`: `static` 팩토리 메서드를 가지고 있는 클래스를 지정
+2. `factory-method`: 팩토리 메서드 자체의 이름을 지정
+
+해당 메서드를 호출할 수 있어야 하고(추후에 설명될 것과 같이, 필요하다면 인자들과 함께), 생성자를 통해 생성된것 처럼 취급되는, 활성 상태의 객체를 반환해야 합니다. Bean definition의 한가지 활용 용도는 레거시 코드의 `static` 팩토리들을 호출하는 것입니다.
+
+아래의 bean definition은 팩토리 메서드를 호출함에 따라 생성되는 bean을 지정합니다. 해당 definition은 반환될 객체의 타입(클래스)를 지정하지 않고, 오로지 팩토리 메서드를 포함하는 클래스만을 지정합니다. 해당 예제에서, `createInstance()` 메서드는 정적 메서드이어야 합니다. 아래 예제는 팩토리 메서들르 지정하는 방법을 보여줍니다.
+
+```xml
+<bean id="clientService"
+    class="examples.ClientService"
+    factory-method="createInstance"/>
+```
+
+아래 예제는 위 bean definition과 함께 작동할 수 있는 클래스를 보여줍니다.
+
+```java
+public class ClientService {
+    private static ClientService clientService = new ClientService();
+    private ClientService() {}
+
+    public static ClientService createInstance() {
+        return clientService;
+    }
+}
+```
+
+(선택적으로) 팩토리 메서드에 인자를 넘기는 것과, 팩토리로부터 반환된 객체의 인스턴스 속성을 설정하는 것에 대한 메커니즘의 자세한 내용은 [의존성과 구성의 세부 사항](#beans-factory-properties-detailed)
 
 #### <a name="beans-factory-class-instance-factory-method"></a>인스턴스 팩토리 메서드로 인스턴스화하기
 
+[정적 팩토리 메서드를 통해 인스턴스화](#beans-factory-class-static-factory-method)하는 것과 비슷하게, 인스턴스 팩토리 메서드로 인스턴스화하는 것은 새로운 bean을 생성하기 위해 컨테이너로부터 이미 존재하는 bean의 비정적(non-static) 메서드를 호출합니다. 이 메커니즘을 사용하려면, `class` 속성은 비워둔 채로 두고, `factory-bean` 속성에, 객체를 생성하기 위해 호출될 인스턴스 메서드를 포함하는 현재의(혹은 부모, 혹은 선조) 컨테이너 속의 bean 이름을 지정하세요. 팩토리 메서드 자체는 `factory-method` 속성으로 설정하세요. 아래의 예제는 그러한 bean을 어떻게 구성하나를 보여줍니다.
+
+```xml
+<!-- createInstance() 이라는 메서드를 포함하는 팩토리 bean -->
+<bean id="serviceLocator" class="examples.DefaultServiceLocator">
+    <!-- 해당 locator bean에 필요한 어떠한 아무 의존성을 주입 -->
+</bean>
+
+<!-- 팩토리 bean에 의해 생성될 bean -->
+<bean id="clientService"
+    factory-bean="serviceLocator"
+    factory-method="createClientServiceInstance"/>
+```
+
+아래의 예제는 위 예제에 상응하는 클래스를 보여줍니다.
+
+```java
+public class DefaultServiceLocator {
+
+    private static ClientService clientService = new ClientServiceImpl();
+
+    public ClientService createClientServiceInstance() {
+        return clientService;
+    }
+}
+```
+
+아래 예제에서 볼 수 있듯이, 하나의 팩토리 클래스는 하나 이상의 팩토리 메서드를 가지고 있을 수 있습니다.
+
+```xml
+<bean id="serviceLocator" class="examples.DefaultServiceLocator">
+    <!-- inject any dependencies required by this locator bean -->
+</bean>
+
+<bean id="clientService"
+    factory-bean="serviceLocator"
+    factory-method="createClientServiceInstance"/>
+
+<bean id="accountService"
+    factory-bean="serviceLocator"
+    factory-method="createAccountServiceInstance"/>
+```
+
+아래의 예제는 위 예제에 상응하는 클래스를 보여줍니다.
+
+```java
+public class DefaultServiceLocator {
+
+    private static ClientService clientService = new ClientServiceImpl();
+
+    private static AccountService accountService = new AccountServiceImpl();
+
+    public ClientService createClientServiceInstance() {
+        return clientService;
+    }
+
+    public AccountService createAccountServiceInstance() {
+        return accountService;
+    }
+}
+```
+
+이 접근법은 팩토리 bean 자체가 의존성 주입(DI)를 통해 관리되고 구성될 수 있다는 것을 보입니다. [의존성과 구성 세부 사항](#beans-factory-properties-detailed)을 확인하세요
+
+<div class="info-box" style="height:125px">
+    <div class="info-icon">
+        <div class="icon"></div>
+    </div>
+    <div class="info-content">
+        Spring 문서에서 "factory bean"이란, Spring 컨테이너에서 구성되고, 인스턴스, 혹은 정적 팩토리 메서드를 통해 객체를 생성하는 bean을 뜻합니다. 이에 반해, `FactoryBean`(대문자에 유의하세요)는 Spring-specific `FactoryBean`구현체 클래스를 나타냅니다.
+    </div>
+</div>
+
 #### Bean의 런타임 타입 검사하기
+
+특정 bean의 런타임 타입을 결정하는 것은 절대 사소한 일이 아닙니다. Bean 메타데이터 정의서의 특정 클래스는 아래 세가지 가능성이 있는 초기 클래스 레퍼런스 입니다.
+
+1. 선언된 팩토리 메서드를 통해 잠재적으로 결합되는 경우
+2. 또 다른 타입의 bean 런타임 타입을 가지는 `FactoryBean`이 되는 경우
+3. 인스턴스 단계의 팩토리 메서드의 경우, 전혀 설정되지 않을 경우 (대신, 지정된 `factory-bean` 이름을 통해 해결될 것입니다.)
+
+추가적으로, AOP proxying은, 타겟 bean의 실제 타입의 제한된 노출을 가지는 인터페이스 기반 프록시로 bean 인스턴스를 감쌀 것입니다(오직 상속받은 인터페이스들만).
+
+추천되는 특정 bean의 실제 런타임 타입을 알아내는 방법은 특정 bean 이름으로 `BeanFactory.getType`을 호출하는 것입니다. 이는 위 경우들을 모두 고려하고, `BeanFactory.getBean` 호출이 반환할 같은 이름을 가지는 bean 객체의 타입을 반환합니다.
 
 ## <a name="beans-dependencies"></a>1.4. Dependencies (의존성)
 
 ### <a name="beans-factory-collaborators"></a>1.4.1. Dependency Injection (의존성 주입)
 
-### 1.4.2. Dependencies와 Configuration 세부 내용
+### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
 #### 확실한 값 (Primitives, Strings, 등...)
 
