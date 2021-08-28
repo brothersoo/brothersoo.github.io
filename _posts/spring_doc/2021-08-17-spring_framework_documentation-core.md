@@ -501,7 +501,52 @@ public class DefaultServiceLocator {
 
 ## <a name="beans-dependencies"></a>1.4. Dependencies (의존성)
 
+전형적인 실무 애플리케이션은 하나의 객체(혹은 Spring 형식의 bean)만 가지고 있지 않습니다. 세상에서 가장 간단한 애플리케이션일지라도 엔드 유저가 일관된 애플리케이셔으로써 보게 될 것을 나타내기 위해 몇개의 서로 협력하는 객체들을 가지고 있습니다. 이후 절에서는, 자립하는 bean definition들을 정의하는 것 부터, 목표를 위해 객체들이 협력하는 완전히 구현된 애플리케이션까지의 단계를 설명할 것입니다.
+
 ### <a name="beans-factory-collaborators"></a>1.4.1. Dependency Injection (의존성 주입)
+
+의존성 주입(DI)는 객체들이 오직 아래 세가지 방법으로만 그들의 의존성(함께 일할 다른 객체)을 정의하는 과정입니다.
+
+1. 생성자 인자들
+2. 팩토리 메서드로 전달되는 인자
+3. 팩토리 메서드로부터 생성되거나 반환된 객체 인스턴스에 설정된 속성들
+
+컨테이너는 bean을 생성할 때 이 의존성들을 주입합니다. 이 과정은 근본적으로, 클래스의 직접적인 생성 혹은 Service Locator 패턴을 사용하여 bean이 자체적으로 그의 인스턴스화 혹은 의존성들의 위치(location of its dependencies)를 제어하는 것에 대한 역전(이런 이유로 Inversion of Control이라는 이름이 생겼습니다)입니다. (역자: 즉, 원래는 bean이 스스로 자신의 의존성 등을 제어하는 것이 자연스럽지만 Spring container가 그 제어권을 가져와 bean 들을 제어하는 것이 제어의 역전이 일어났다고 보는 것입니다.)
+
+DI 원칙으로 코드는 깨끗해지고, 객체들이 그들의 의존성들과 함께 제공된다면 탈동조화(decoupling)을 효과적으로 진행할 수 있습니다. 객체들은 그들의 의존성들을 탐색하지 않고, 그 의존성들의 위치 혹은 클래스를 알지 못합니다. 그 결과로, 특히 의존성들이 단위 테스트에 사용될 stub, mock 구현체들을 허용하는 인터페이스 혹은 abstract base class들에 있을 경우, 클래스들은 테스트하기 용이해집니다.
+
+DI는 크게 두가지 형태로 존재합니다: [생성자 기반 의존성 주입](#beans-constructor-injection) 그리고 [Setter 기반 의존성 주입](#beans-setter-injection).
+
+#### <a name="#beans-constructor-injection"></a> 생성자 기반 의존성 주입
+
+생성자 기반 DI는 컨테이너가, 각각이 의존성을 나타내는 몇개의 인자들을 가지는 생성자를 호출함으로써, 이루어집니다. 이와, 특정 인자들을 가지고 `Static` 팩토리 메서드를 호출하여 bean을 생성하는 것은 거의 동등하고, 해당 의견에서는 생성자로의 인자와 `static` 팩토리 메서드로의 인자를 비슷하게 취급합니다. 아래 예제는 오직 생성자 주입으로만 의존성이 주입될 수 있는 클래스를 보입니다.
+
+```java
+public class SimpleMovieLister {
+
+    // SimpleMovieLister는 MovieFinder를 의존하고 있습니다.
+    private final MovieFinder movieFinder;
+
+    // Spring 컨테이너가 MovieFinder를 주입할 수 있도록 하는 생성자
+    public SimpleMovieLister(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // 주입된 MovieFinder를 실제 사용할 비즈니스 로직 (생략)
+}
+```
+
+이 클래스에는 전혀 특별할 것이 없다는 것에 주의하세요. 이것은 컨테이너 특정 인터페이스, 베이스 클래스, 혹은 어노테이션에 아무런 의존성도 없는 POJO(Plain Old Java Object)입니다.
+
+##### <a name="beans-factory-ctor-arguments-resolution"></a>생성자 인자 결정
+
+**생성자 인자 타입 맞추기**
+
+**생성자 인자 인덱스**
+
+**생성자 인자 이름**
+
+#### <a name="beans-setter-injection"></a>Setter 기반 의존성 주입
 
 ### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
