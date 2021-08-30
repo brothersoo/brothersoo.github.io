@@ -538,15 +538,143 @@ public class SimpleMovieLister {
 
 이 클래스에는 전혀 특별할 것이 없다는 것에 주의하세요. 이것은 컨테이너 특정 인터페이스, 베이스 클래스, 혹은 어노테이션에 아무런 의존성도 없는 POJO(Plain Old Java Object)입니다.
 
-##### <a name="beans-factory-ctor-arguments-resolution"></a>생성자 인자 결정
+##### <a name="beans-factory-ctor-arguments-resolution"></a>생성자 인자 처리(Resolution)
 
-**생성자 인자 타입 맞추기**
+생성자 인자 처리 매칭은 인자의 타입으로 일어납니다. Bean definition의 생성자 인자에 잠재적 모호성이 없다면, bean definition에 정의된 생성자 인자들의 순서가 곧 해당 bean이 인스턴스화될 때의 적절한 생성자로전달될 순서입니다. 아래의 클래스를 참고하세요:
+
+```java
+package x.y;
+
+public class ThingOne {
+
+    public ThingOne(ThingTwo thingTwo, ThingThree thingThree) {
+        // ...
+    }
+}
+```
+
+`ThingTwo`와 `ThingThree`는 상속 관계에 있지 않다고 가정한다면, 잠재적 모호성은 존재하지 않습니다. 이에, 아래의 구성은 정상적으로 작동할 것이고, `<constructor-arg/>` 요소에 생성자 인자 인덱스, 혹은 타입을 명시적으로 특정할 필요가 없습니다.
+
+```xml
+<beans>
+    <bean id="beanOne" class="x.y.ThingOne">
+        <constructor-arg ref="beanTwo"/>
+        <constructor-arg ref="beanThree"/>
+    </bean>
+
+    <bean id="beanTwo" class="x.y.ThingTwo"/>
+
+    <bean id="beanThree" class="x.y.ThingThree"/>
+</beans>
+```
+
+하나의 bean이 더 참조되고, 그의 타입이 정해져있다면, 매칭은 이루어질 수 있습니다(이전의 예제에서 이루어진 것과 같이). `<value>true</value>`와 같은 간단한 타입이 사용되었다면, Spring은 값의 타입을 결정할 수 없고, 도움 없이는 타입 매칭이 이루어질 수 없습니다. 아래의 클래스를 참고하세요:
+
+```java
+package examples;
+
+public class ExampleBean {
+
+    // 궁긍적 진리를 구하는데 걸리는 해의 수
+    private final int years;
+
+    // 인생, 우주, 그리고 모든것에 대한 진리
+    private final String ultimateAnswer;
+
+    public ExampleBean(int years, String ultimateAnswer) {
+        this.years = years;
+        this.ultimateAnswer = ultimateAnswer;
+    }
+}
+```
+
+**생성자 인자 타입 매칭하기**
+
+이전의 예제에서, 아래 예제에서 보이듯이, `type` 요소를 사용하여 생성자 인자를 명시적으로 특정한다면, 컨테이너는 간단한 타입들로 타입 매칭을 할 수 있습니다.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean">
+    <constructor-arg type="int" value="7500000"/>
+    <constructor-arg type="java.lang.String" value="42"/>
+</bean>
+```
 
 **생성자 인자 인덱스**
 
+아래의 예제가 보이듯이, `index` 요소를 사용하여 생성자 인자의 인덱으를 명시적으로 특정할 수 있습니다.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean">
+    <constructor-arg index="0" value="7500000"/>
+    <constructor-arg index="1" value="42"/>
+</bean>
+```
+
+다수의 간단한 값의 모호성에 대한 해결의 추가적인 내용으로, 인텍스를 특정함으로써 생성자가 같은 타입의 두개의 인자를 가지는 것에 대한 모호성을 해결할 수 있습니다.
+
+<div class="info-box" style="height:75px">
+    <div class="info-icon">
+        <div class="icon"></div>
+    </div>
+    <div class="info-content">
+        인덱스는 0을 기준으로 합니다.
+    </div>
+</div>
+
+<br>
+
 **생성자 인자 이름**
 
+아래의 예제가 보이듯이 값 명확화를 위해 생성자 파라미터 이름을 사용할 수 있습니다.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean">
+    <constructor-arg name="years" value="7500000"/>
+    <constructor-arg name="ultimateAnswer" value="42"/>
+</bean>
+```
+
+특별한 설정 없이 이가 작동하기 위해서는 debug flag가 enabled된 상태로 코드가 컴파일되어, Spring이 생성자로부터 파라미터 이름을 검색할 수 있게 해야 한다는 것을 명심하세요. 만약 debug flag를 설정하지 못하거나, 하지 않고 싶다면, 생성자 인자들을 명시적으로 이름 짓기 위해[@ConstructorProperties](https://docs.oracle.com/javase/8/docs/api/java/beans/ConstructorProperties.html) JDK 어노테이션을 사용할 수 있습니다. 그렇게 된다면 예제 클래스는 아래와 같아질 것입니다.
+
+```java
+package examples;
+
+public class ExampleBean {
+
+    // Fields omitted
+
+    @ConstructorProperties({"years", "ultimateAnswer"})
+    public ExampleBean(int years, String ultimateAnswer) {
+        this.years = years;
+        this.ultimateAnswer = ultimateAnswer;
+    }
+}
+```
+
 #### <a name="beans-setter-injection"></a>Setter 기반 의존성 주입
+
+Setter 기반 DI는 bean을 인스턴스화하기 위한 기본 생성자(no-argument constructor) 혹은 인자 없는 팩토리 메서드의 호출 이후 bean에 있는 setter 메서드들을 컨테이너가 호출함으로써 이루어집니다.
+
+이래의 예제는 순수 setter 주입을 사용해야만 의존성이 주입될 수 있는 클래스를 보입니다. 해당 클래스는 전통적인 Java입니다. 이는 컨테이너 특정 인터페이스, 베이스 클래스, 혹은 어노테이션에 대한 의존성이 없는 POJO입니다.
+
+```java
+public class SimpleMovieLister {
+
+    // SimpleMovieLister는 MovieFinder를 의존하고 있습니다.
+    private MovieFinder movieFinder;
+
+    // Spring 컨테이너가 MovieFinder를 주입할 수 있도록 하는 setter 메서드
+    public void setMovieFinder(MovieFinder movieFinder) {
+        this.movieFinder = movieFinder;
+    }
+
+    // 주입된 MovieFinder를 실제로 사용하는 비즈니스 로직 (생략)
+}
+```
+
+`ApplicationContext`는 자신이 관리하는 bean들을 위해 생성자 기반, 그리고 setter 기반 DI를 지원합니다. 생성자 접근을 통해 이미 몇개의 의존성들이 주입된 후에도 setter 기반 DI를 지원합니다. 속성의 형태를 변환하기 위한 `PropertyEditor` 인스턴스들과의 결합에서 사용하는 `BeanDefinition`의 형태로 의존성들을 구성합니다. 하지만, 대부분의 Spring 사용자들은 이 클래스들을 직접적으로 작업하지 않고(프로그래밍 방식으로), 대신 XML `bean` definitions, 어노테이션 처리된 components(`@Component`, `@Controller` 등으로 어노테이션 처리된 클래스들), 혹은 자바 기반의 `@Configuration` 클래스들 안의 `@Bean` 메서드들을 통해 작업합니다. 해당 소스들은 그 다음에 내부적으로 `BeanDefinition` 속의 인스턴스들로 변환되고, 전체 Spring IoC 컨테이너 인스턴스를 불러오기 위해 사용됩니다.
+
+#### <a name="beans-dependency-resolution"></a> 의존성 관리 절차 (Dependency Resolution Process)
 
 ### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
