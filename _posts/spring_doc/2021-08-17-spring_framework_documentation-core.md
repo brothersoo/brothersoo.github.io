@@ -517,7 +517,7 @@ DI 원칙으로 코드는 깨끗해지고, 객체들이 그들의 의존성들�
 
 DI는 크게 두가지 형태로 존재합니다: [생성자 기반 의존성 주입](#beans-constructor-injection) 그리고 [Setter 기반 의존성 주입](#beans-setter-injection).
 
-#### <a name="#beans-constructor-injection"></a> 생성자 기반 의존성 주입
+#### <a name="beans-constructor-injection"></a> 생성자 기반 의존성 주입
 
 생성자 기반 DI는 컨테이너가, 각각이 의존성을 나타내는 몇개의 인자들을 가지는 생성자를 호출함으로써, 이루어집니다. 이와, 특정 인자들을 가지고 `Static` 팩토리 메서드를 호출하여 bean을 생성하는 것은 거의 동등하고, 해당 의견에서는 생성자로의 인자와 `static` 팩토리 메서드로의 인자를 비슷하게 취급합니다. 아래 예제는 오직 생성자 주입으로만 의존성이 주입될 수 있는 클래스를 보입니다.
 
@@ -674,7 +674,28 @@ public class SimpleMovieLister {
 
 `ApplicationContext`는 자신이 관리하는 bean들을 위해 생성자 기반, 그리고 setter 기반 DI를 지원합니다. 생성자 접근을 통해 이미 몇개의 의존성들이 주입된 후에도 setter 기반 DI를 지원합니다. 속성의 형태를 변환하기 위한 `PropertyEditor` 인스턴스들과의 결합에서 사용하는 `BeanDefinition`의 형태로 의존성들을 구성합니다. 하지만, 대부분의 Spring 사용자들은 이 클래스들을 직접적으로 작업하지 않고(프로그래밍 방식으로), 대신 XML `bean` definitions, 어노테이션 처리된 components(`@Component`, `@Controller` 등으로 어노테이션 처리된 클래스들), 혹은 자바 기반의 `@Configuration` 클래스들 안의 `@Bean` 메서드들을 통해 작업합니다. 해당 소스들은 그 다음에 내부적으로 `BeanDefinition` 속의 인스턴스들로 변환되고, 전체 Spring IoC 컨테이너 인스턴스를 불러오기 위해 사용됩니다.
 
-#### <a name="beans-dependency-resolution"></a> 의존성 관리 절차 (Dependency Resolution Process)
+<div class="blue-text-box">
+<p style="text-align: center; font-size: 20px">생성자 기반 vs setter 기반?</p>
+
+<p>생성자 기반과 setter 기반 DI를 혼영하여 사용할 수 있기 때문에, 필수 의존성에는 생성자를, 선택적 의존성에는 setter 메서드 혹은 configuration 메서드를 사용하면 좋습니다. Setter 메서드에 <a href="#beans-required-annotation">@Required</a> 어노테이션을 사용하여 해당 특성을 필수적인 의존성으로 만들 수 있습니다; 그러나, 인자의 프로그램적 검증이 있는 생성자 주입이 더 좋은 선택으로 보입니다.</p>
+
+<p>String 팀은 대개 변경 불가(immutable) 객체로써 애플리케이션 요소들을 구현할 수 있게 하고, 필수 의존성들이 <code>null</code>이 아님을 보장하게 해주는 생성자 주입을 추천합니다. 뿐만아니라, 생성자 주입된 요소들은 항상 완전히 초기화된 상태로 클라이언트(호출한) 코드에게 반환됩니다. 추가적으로, 많은 양의 생성자 인자는 클래스가 너무 많은 책임을 가지고 있음을 내포하는 안좋은 코드(bad code smell)이고, 나은 주소 별 분리를 고려하여 리팩토링 되어야 합니다.</p>
+
+<p>Setter 주입은 주로 클래스 내부에서 합리적인 디폴트 값을 할당받을 수 있는 선택적인 의존성에만 사용되어야 합니다. 그렇지 않다면, 해당 의존성을 사용하는 모든 곳에서 not-null 검증이 필요할 것입니다. Setter 주입의 한가지 장점은, setter 메서드는 해당 클래스의 객체들을 재구성 하거나, 재주입 할 수 있도록 합니다. 그러므로 <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#jmx">JMX MBeans</a>을 통한 관리는 setter 주입의 나쁘지 않은 사용 사례입니다.</p>
+
+<p>각각의 클래스들에 가장 알맞은 DI 방식을 선택하세요. 가끔, 소스를 가지고 있지 않은 서드 파티 클래스들을 사용할 때, 선택은 개인의 몫이 됩니다. 예를 들어, 만약 서드 파티 클래스가 어떠한 setter 메서드도 보여주지 않고 있다면, 생성자 주입만이 유일하게 가능한 DI 형식이 될 것입니다.</p>
+</div>
+
+#### <a name="beans-dependency-resolution"></a> 의존성 관리 과정 (Dependency Resolution Process)
+
+컨테이너는 다음과 같이 bean 의존성 관리를 이루어냅니다.
+
+* `ApplicationContext`는 모든 bean들을 설명하는 구성 메타데이터를 가지고 생성되고 초기화 됩니다. 구성 메타데이터는 XML, Java 코드, 혹은 어노테이션들로 작성될 수 있습니다.
+* 각 bean들의 의존성들은 properties, 생성자 인자들, 혹은 정적 팩토리 메서드(일반적인 생성자 대신에 사용한다면)의 형태로 표현될 것입니다. 이 의존성들은 bean이 실제로 생성될 떄 bean에게 제공됩니다.
+* 각 property 혹은 생성자 인자는 사용할 값의 실제 설명, 혹은 컨테이너 안의 또다른 bean으로의 참조입니다.
+* 값을 나타내는 각 property 혹은 생성자 인자는 기존의 특정된 형태에서, 해당 property 혹은 생성자 인자의 실제 타입으로 변환됩니다. 기본적으로 Spring은 string 형태로 제공된 값을 `int`, `long`, `String`, `boolean` 등, 모든 내장 타입으로 변환할 수 있습니다.
+
+Spring 컨테이너는 컨테이너가 생성될 때 각 bean의 구성을 검증합니다. 그러나 bean properties 자체는 bean이 실제 생성되기 전까지는 설정되지 않습니다. 싱글톤-스코프(singleton-scoped)의, 그리고 미리 인스턴스화(pre-instantiated: 기본값) 되기로 설정된 bean들은 컨테이너가 생성될 때 생성됩니다. (스코프들은 [Bean 스코프](#beans-factory-scopes)에 정의되어있습니다.) 그렇지 않다면, bean은 오직 그가 요청되었을 때에만 생성됩니다. Bean의 생성은, bean의 의존성, 그리고 그 의존성의 의존성(등등)이 생성되고 할당됨에 따라, 잠재적으로 beans의 그래프(graph of beans)를 발생시킬 수 있습니다. 이와 같은 의존성들 사이의 resolution mismatch는 늦게 나타날 수 있다는 것을 참고하세요-영향 받은 첫번째 bean의 생성에 나타날 것입니다.
 
 ### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
@@ -722,6 +743,7 @@ public class SimpleMovieLister {
 
 ## <a name="beans-annotation-config"></a>1.9. 어노테이션 기반 컨테이너 설정
 
+### <a name="beans-required-annotation"></a>1.9.1. @Required
 
 ## <a name="beans-java"></a>1.12. 자바 기반의 컨테이너 설정
 
