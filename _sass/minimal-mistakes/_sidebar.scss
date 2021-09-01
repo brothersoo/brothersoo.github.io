@@ -83,6 +83,11 @@
     padding-left: 1em;
     z-index: 10;
 
+    &.sticky_top {
+      position: static;
+      width: auto
+    }
+
     &.sticky {
       @include clearfix();
       position: -webkit-sticky;
@@ -95,6 +100,10 @@
   @include breakpoint($x-large) {
     width: $right-sidebar-width;
     margin-right: -1 * $right-sidebar-width;
+
+    &.sticky_top {
+      width: auto;
+    }
   }
 }
 
