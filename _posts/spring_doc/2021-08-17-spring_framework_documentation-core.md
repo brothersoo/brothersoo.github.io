@@ -676,7 +676,7 @@ public class SimpleMovieLister {
 `ApplicationContext`는 자신이 관리하는 bean들을 위해 생성자 기반, 그리고 setter 기반 DI를 지원합니다. 생성자 접근을 통해 이미 몇개의 의존성들이 주입된 후에도 setter 기반 DI를 지원합니다. 속성의 형태를 변환하기 위한 `PropertyEditor` 인스턴스들과의 결합에서 사용하는 `BeanDefinition`의 형태로 의존성들을 구성합니다. 하지만, 대부분의 Spring 사용자들은 이 클래스들을 직접적으로 작업하지 않고(프로그래밍 방식으로), 대신 XML `bean` definitions, 어노테이션 처리된 components(`@Component`, `@Controller` 등으로 어노테이션 처리된 클래스들), 혹은 자바 기반의 `@Configuration` 클래스들 안의 `@Bean` 메서드들을 통해 작업합니다. 해당 소스들은 그 다음에 내부적으로 `BeanDefinition` 속의 인스턴스들로 변환되고, 전체 Spring IoC 컨테이너 인스턴스를 불러오기 위해 사용됩니다.
 
 <div class="blue-text-box">
-<p style="text-align: center; font-size: 20px">생성자 기반 vs setter 기반?</p>
+<p style="text-align: center; font-size: 20px">생성자 기반 vs setter 기반</p>
 
 <p>생성자 기반과 setter 기반 DI를 혼영하여 사용할 수 있기 때문에, 필수 의존성에는 생성자를, 선택적 의존성에는 setter 메서드 혹은 configuration 메서드를 사용하면 좋습니다. Setter 메서드에 <a href="#beans-required-annotation">@Required</a> 어노테이션을 사용하여 해당 특성을 필수적인 의존성으로 만들 수 있습니다; 그러나, 인자의 프로그램적 검증이 있는 생성자 주입이 더 좋은 선택으로 보입니다.</p>
 
@@ -697,6 +697,24 @@ public class SimpleMovieLister {
 * 값을 나타내는 각 property 혹은 생성자 인자는 기존의 특정된 형태에서, 해당 property 혹은 생성자 인자의 실제 타입으로 변환됩니다. 기본적으로 Spring은 string 형태로 제공된 값을 `int`, `long`, `String`, `boolean` 등, 모든 내장 타입으로 변환할 수 있습니다.
 
 Spring 컨테이너는 컨테이너가 생성될 때 각 bean의 구성을 검증합니다. 그러나 bean properties 자체는 bean이 실제 생성되기 전까지는 설정되지 않습니다. 싱글톤-스코프(singleton-scoped)의, 그리고 미리 인스턴스화(pre-instantiated: 기본값) 되기로 설정된 bean들은 컨테이너가 생성될 때 생성됩니다. (스코프들은 [Bean 스코프](#beans-factory-scopes)에 정의되어있습니다.) 그렇지 않다면, bean은 오직 그가 요청되었을 때에만 생성됩니다. Bean의 생성은, bean의 의존성, 그리고 그 의존성의 의존성(등등)이 생성되고 할당됨에 따라, 잠재적으로 beans의 그래프(graph of beans)를 발생시킬 수 있습니다. 이와 같은 의존성들 사이의 resolution mismatch는 늦게 나타날 수 있다는 것을 참고하세요-영향 받은 첫번째 bean의 생성에 나타날 것입니다.
+
+<div class="blue-text-box">
+<p style="text-align: center; font-size: 20px">순환 의존성 (Circular dependencies)</p>
+
+<p>주로 생성자 주입을 사용한다면, 해결할 수 없는 순환 의존성 시나리오가 생길 수 있습니다.</p>
+
+<p>예를 들어: 클래스 A는 생성자 주입을 통해 클래스 B의 인스턴스를 필요로 하고, 클래스 B 또한 생성자 주입을 통해 클래스 A의 인스턴스를 필요로 합니다. 이때 A와 B를 서로에게 주입하도록 bean을 구성한다면, Spring IoC 컨테이너는 컨타임에 해당 순환 참조를 탐지하고 <code>BeanCurrentlyInCreationException</code>를 던집니다.</p>
+
+<p>한가지 가능한 해결방법은 몇개의 클래스들의 소스코드를 생성자 대신 setter에 의해 구성되도록 소스 코드를 수정하는 것입니다. 혹은, 생성자 주입을 사용하지 말고 setter 주입만 사용하세요. 다른 말로, 추천하는 방법은 아니지만, setter 주입으로 순환 참조를 해결할 수 있습니다.</p>
+
+<p>일반적인 경우 (순환 의존이 없는 경우)와 다르게, bean A와 bean B 간의 순환 의존은 하나의 bean이 상대 bean에 완전히 초기화 된 채로 주입되기를 강제합니다 (고전적인 닭과 달걀의 문제와 같이요).</p>
+</div>
+
+<br>
+
+일반적으로 올바른 행위를 하는것에 대해 Spring을 신뢰해도 좋습니다. Spring은 존재하지 않는 bean으로의 참조와 순환 의존과 같은 configuration 문제를, 컨테이너를 불러옴과 함께 탐지합니다. Spring은 bean이 실제 생성될 때 최대한 늦게 property을 설정하고, 의존성을 주입합니다. 이는, 정상적으로 불러진 Spring 컨테이너가, 생성하는데 혹은 의존성을 부여하는데 문제가 있는 객체를 요청할 때 예외를 발생시킬 수 있다는 것입니다 - 예를 들어, 속성이 빠져있거나 유효하지 않은 경우 bean은 예외를 던집니다. 이 잠재적으로 지연된 가시적 구성 문제는, 기본적 `ApplicationContext` 구현체들이 왜 싱글톤 bean들을 미리 인스턴스화하는지에 대한 이유입니다. 실제로 필요하기 이전에 생성된 이 bean들의 앞선 비용과 메모리에 대한 configuration 문제를 `ApplicationContext`가 생성된 이후가 아닌 생성될 때 발견할 것입니다. 하지만 해당 디폴트 행위를 override함으로써 싱글톤 bean들이 미리 즉시 인스턴스화되지 않고, 지연 생성되도록 할 수 있습니다.
+
+순환 의존이 존재하지 않는다면, 협력하는 각 bean들은 상대 bean에게 주입되기 이전에 완전히 구성됩니다. 이는, bean A가 bean B를 의존할 때, Spring IoC 컨테이너는 bean A의 setter 메서드를 호출하기 이전에 bean B를 완전히 구성을 마친다는 의미입니다. 완전히 구성을 마친다는 것은, bean이 인스턴스화되고 (미리 인스턴스화된 싱글톤이 아니라면), 의존성들이 설정되고, 관계된 생명주기(lifecycle) 메서드들([구성된 초기화 메서드](#beans-factory-lifecycle-initializingbean) 혹은 [InitializingBean 콜백 메서드](#beans-factory-lifecycle-initializingbean))이 호출된다는 것입니다.
 
 ### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
