@@ -716,6 +716,129 @@ Spring 컨테이너는 컨테이너가 생성될 때 각 bean의 구성을 검�
 
 순환 의존이 존재하지 않는다면, 협력하는 각 bean들은 상대 bean에게 주입되기 이전에 완전히 구성됩니다. 이는, bean A가 bean B를 의존할 때, Spring IoC 컨테이너는 bean A의 setter 메서드를 호출하기 이전에 bean B를 완전히 구성을 마친다는 의미입니다. 완전히 구성을 마친다는 것은, bean이 인스턴스화되고 (미리 인스턴스화된 싱글톤이 아니라면), 의존성들이 설정되고, 관계된 생명주기(lifecycle) 메서드들([구성된 초기화 메서드](#beans-factory-lifecycle-initializingbean) 혹은 [InitializingBean 콜백 메서드](#beans-factory-lifecycle-initializingbean))이 호출된다는 것입니다.
 
+#### 의존성 주입 예시
+
+아래의 예제는 setter 기반 DI를 위해 XML 기반 구성 메타데이터를 사용합니다. Spring XML configuration 파일의 작은 부분은 다음과 같이 몇개의 bean definition을 명시합니다.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean">
+    <!-- 중첩된 ref 요소를 사용한 setter 주입 -->
+    <property name="beanOne">
+        <ref bean="anotherExampleBean"/>
+    </property>
+
+    <!-- 조금 더 멋진 ref 요소를 사용한 setter 주입 -->
+    <property name="beanTwo" ref="yetAnotherBean"/>
+    <property name="integerProperty" value="1"/>
+</bean>
+
+<bean id="anotherExampleBean" class="examples.AnotherBean"/>
+<bean id="yetAnotherBean" class="examples.YetAnotherBean"/>
+```
+
+아래의 예제는 위 예제에 대응하는 `ExampleBean` 클래스입니다.
+
+```java
+public class ExampleBean {
+
+    private AnotherBean beanOne;
+
+    private YetAnotherBean beanTwo;
+
+    private int i;
+
+    public void setBeanOne(AnotherBean beanOne) {
+        this.beanOne = beanOne;
+    }
+
+    public void setBeanTwo(YetAnotherBean beanTwo) {
+        this.beanTwo = beanTwo;
+    }
+
+    public void setIntegerProperty(int i) {
+        this.i = i;
+    }
+}
+```
+
+이전 예제에서, setter들은 XML 파일 안에서 properties와 대응하도록 선언되어있습니다. 아래의 예제는 생성자 기반 DI를 보여줍니다.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean">
+    <!-- 중첩된 ref 요소를 사용한 생성자 주입-->
+    <constructor-arg>
+        <ref bean="anotherExampleBean"/>
+    </constructor-arg>
+
+    <!-- 조금 더 멋진 ref 속성을 사용한 생성자 주입 -->
+    <constructor-arg ref="yetAnotherBean"/>
+
+    <constructor-arg type="int" value="1"/>
+</bean>
+
+<bean id="anotherExampleBean" class="examples.AnotherBean"/>
+<bean id="yetAnotherBean" class="examples.YetAnotherBean"/>
+```
+
+아래의 예제는 이에 대응하는 `ExampleBean`을 나타냅니다.
+
+```java
+public class ExampleBean {
+
+    private AnotherBean beanOne;
+
+    private YetAnotherBean beanTwo;
+
+    private int i;
+
+    public ExampleBean(
+        AnotherBean anotherBean, YetAnotherBean yetAnotherBean, int i) {
+        this.beanOne = anotherBean;
+        this.beanTwo = yetAnotherBean;
+        this.i = i;
+    }
+}
+```
+
+Bean definition 안에 지정된 생성자 인자들은 `ExampleBean`의 생성자 요소로써 사용됩니다.
+
+이제 생성자를 사용하는 것 대신, Spring이 객체의 인스턴스를 반환하는 `static` 팩토리 메서드를 호출하는 변형된 예시를 생각해보세요.
+
+```xml
+<bean id="exampleBean" class="examples.ExampleBean" factory-method="createInstance">
+    <constructor-arg ref="anotherExampleBean"/>
+    <constructor-arg ref="yetAnotherBean"/>
+    <constructor-arg value="1"/>
+</bean>
+
+<bean id="anotherExampleBean" class="examples.AnotherBean"/>
+<bean id="yetAnotherBean" class="examples.YetAnotherBean"/>
+```
+
+아래의 예제는 대응하는 `ExampleBean` 클래스를 나타냅니다.
+
+```java
+public class ExampleBean {
+
+    // private 생성자
+    private ExampleBean(...) {
+        ...
+    }
+
+    // 정적 팩토리 메서드; 해당 메서드의 인자들은 실제
+    // 사용되든, 안되든간에, 반환되는 bean의 의존성으로 취급할 수 있습니다.
+    public static ExampleBean createInstance (
+        AnotherBean anotherBean, YetAnotherBean yetAnotherBean, int i) {
+
+        ExampleBean eb = new ExampleBean (...);
+        // 기타 기능들...
+        return eb;
+    }
+}
+```
+
+`static` 팩토리 메서드로의 인자들은 마치 생성자가 실제 사용되는 것 처럼 `<constructor-arg>` 요소들로 제공됩니다. 팩토리 메서드가 반환하는 클래스의 타입은 해당 `static` 팩토리 메서드를 포함하고 있는 클래스의 타입과 동일하지 않아도 됩니다 (위 예제는 동일하지만요). 인스턴스 팩토리 메서드(non-static)는 본질적으로 동일한 방식으로 사용될 수 있기 때문에 (`class` 속성 대신 `factory-bean` 속성을 사용하는 것과), 여기에서는 세부 내용을 다루지 않을 것입니다.
+
 ### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
 #### 확실한 값 (Primitives, Strings, 등...)
