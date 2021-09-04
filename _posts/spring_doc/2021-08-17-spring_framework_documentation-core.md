@@ -841,15 +841,121 @@ public class ExampleBean {
 
 ### <a name="beans-factory-properties-detailed"></a>1.4.2. Dependencies와 Configuration 세부 사항
 
-#### 확실한 값 (Primitives, Strings, 등...)
+[이전 절](#beans-factory-collaborators)에서 언급했듯이, bean 속성과 생성자 인자를, 다른 관리되는 bean들(collaborators)로의 참조 혹은 inline 정의된 값으로써 정의할 수 있습니다. Spring의 XML 기반 구성 메타데이터는 해당 용도를 위해 자신의 `<property/>`와 `<constructor-arg/>` 요소들 속의 서브 요소 타입을 지원합니다.
 
-#### `idref` 원소
+#### <a name="beans-value-element></a>확실한 값 (Primitives, Strings, 등...)
 
-#### 다른 bean으로의 참조 (Collaborators)
+`<property/>` 요소의 `value` 속성은 property 혹은 생성자 인자를 사람이 읽을 수 있는 문자열로써 특정합니다. Spring의 [conversion service](#core-convert-ConversionService-API)는 해당 값들을 `String`에서 property 혹은 인자의 실제 타입으로 변환하기 위해 사용됩니다. 아래의 예제는 다양한 값들이 설정되는 것을 보입니다.
+
+```xml
+<bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <!-- results in a setDriverClassName(String) call -->
+    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/mydb"/>
+    <property name="username" value="root"/>
+    <property name="password" value="misterkaoli"/>
+</bean>
+```
+
+아래의 예제에서는 더욱 간결한 XML 구성을 위해 [p-namespace](#beans-p-namespace)를 사용합니다.
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close"
+        p:driverClassName="com.mysql.jdbc.Driver"
+        p:url="jdbc:mysql://localhost:3306/mydb"
+        p:username="root"
+        p:password="misterkaoli"/>
+
+</beans>
+```
+
+위 예제가 더 간결합니다. 그러나 bean definitions를 생성할 때 자동 property 완성을 지원하는 IDE ([IntelliJ IDEA](https://www.jetbrains.com/idea/) 혹은 [Spring Tools of Eclipse](https://spring.io/tools))를 사용하지 않는 이상, 오타는 주로 설계할 때보단 런타임에서 발견됩니다. 이런 IDE의 도움을 강력하게 추천합니다.
+
+또한, 아래와 같이 `java.util.Properties` 인스턴스를 구성해도 됩니다.
+
+```xml
+<bean id="mappings"
+    class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+
+    <!-- java.util.Properties 로써 타입이 명시 -->
+    <property name="properties">
+        <value>
+            jdbc.driver.className=com.mysql.jdbc.Driver
+            jdbc.url=jdbc:mysql://localhost:3306/mydb
+        </value>
+    </property>
+</bean>
+```
+
+Spring 컨테이너는 JavaBeans의 `PropertyEditor` 메커니즘을 사용하여, `<value/>` 요소 안의 텍스트를 `java.util.Properties` 인스턴스로 변환합니다. 이것은 멋진 단축이며, Spring 팀이 `value` 속성 스타일 대신 중첩된 `<value/>` 요소의 사용을 제공하는 몇 안되는 부분 중 하나입니다.
+
+#### <a name="beans-idref-element"></a>`idref` 원소
+
+`idref` 요소는 간단히, 컨테이서 속의 다른 bean의 `id`를, `<constructor-arg>` 혹은 `<property/>` 요소로 error를 방지하며 전달하는 방법입니다. 아래의 예제는 이것을 사용하는 방법을 보여줍니다.
+
+```xml
+<bean id="theTargetBean" class="..."/>
+
+<bean id="theClientBean" class="...">
+    <property name="targetName">
+        <idref bean="theTargetBean"/>
+    </property>
+</bean>
+```
+
+위 bean definition 단편은 아래의 단편과 완벽하게 동일합니다 (런타임에서).
+
+```xml
+<bean id="theTargetBean" class="..." />
+
+<bean id="client" class="...">
+    <property name="targetName" value="theTargetBean"/>
+</bean>
+```
+
+배포 단계에서 `idref` 태그가, 참조되고 이름지어진 bean이 실제로 존재하는지 컨테이너가 검증할 수 있도록 하기 때문에, 첫번째 형식이 두번째 방식보다 선호됩니다. 두번째 방식에서는, `client` bean의 `targetName` property로 넘겨지는 값에 대한 검증이 이루어지지 않습니다. 오타는 `client` bean이 실제로 인스턴스화 될 때만 발견됩니다 (대개 치명적인 결과와 함께 말이죠). `client` bean이 [프로토타입 bean](#beans-factory-scopes)이라면, 이 오타와, 결과된 exception은 컨테이너가 배포되고 오랜 후에 발견될 것입니다.
+
+<div class="info-box" style="height: 120px;">
+    <div class="info-icon">
+        <div class="icon-div"><div class="icon"></div></div>
+    </div>
+    <div class="info-content">
+        일반적인 <code>bean</code> 참조의 값을 더이상 제공하지 않기 때문에, <code>idref</code> 요소의 <code>local</code> 속성은 4.0 beans XSD에서 더이상 지원되지 않습니다. 4.0 스키마로 업그레이드한다면 사용하던 <code>idref local</code> 참조를 <code>idref bean</code>로 변경해야 합니다.
+    </div>
+</div>
+
+<br>
+
+일반적으로 `<idref/>` 요소가 값을 가져오는 장소는 (최소 Spring 2.0 이전의 버전들에서), `ProxyFactoryBean` bean definition 안의 [AOP interceptors](#aop-pfb-1)의 configuration 안에 있습니다. Interceptor 이름들을 특정할 때 `<idref/>` 요소들을 사용하는 것은 interceptor의 ID를 잘못 기입하는 것을 방지해줍니다.
+
+#### <a name="beans-ref-element"></a>다른 bean으로의 참조 (Collaborators)
 
 #### <a name="beans-inner-beans"></a>내부 bean(inner bean)
 
-### 1.4.3. `depends-on` 사용하기
+#### <a name="beans-collection-elements"></a>Collections
+
+#### <a name="beans-collection-elements-merging"></a>Collection 병합하기
+
+##### <a name="beans-collection-merge-limitations"></a>Collection 병합의 한계
+
+##### <a name="beans-collection-elements-strongly-typed"></a>엄격하게 타입 지정된 collection
+
+#### <a name="beans-null-element"></a>Null과 빈 문자열 값
+
+#### <a name="beans-p-namespace"></a>p-namespace를 사용한 XML 단축
+
+#### <a name="beans-c-namespace"></a>c-namespace를 사용한 XML 단축
+
+#### <a name="beans-compound-property-names"></a>혼합 property 이름
+
+### <a name="beans-factory-dependson"></a>1.4.3. `depends-on` 사용하기
 
 ### <a name="beans-factory-lazy-init"></a>1.4.4 Lazy-initialized Beans (지연 초기화)
 
@@ -903,3 +1009,7 @@ public class ExampleBean {
 # <a name="resources"></a>2. Resources
 
 ## <a name="resources-app-ctx"></a>2.8 Application Contexts와 Resource Paths
+
+### <a name="core-convert-ConversionService-API"></a>3.4.4. `ConversionService` API
+
+### <a name="aop-pfb-1"></a>6.4.1. 기초
