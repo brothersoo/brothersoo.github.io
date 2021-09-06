@@ -937,6 +937,41 @@ Spring 컨테이너는 JavaBeans의 `PropertyEditor` 메커니즘을 사용하�
 
 #### <a name="beans-ref-element"></a>다른 bean으로의 참조 (Collaborators)
 
+`ref` 요소는 `<constructor-arg/>` 혹은 `<property/>` definition 요소 안의 최종 요소입니다. 여기서, 컨테이너가 관리하는 다른 bean(collaborator)으로의 참조가 될 bean의 구체적 property의 값을 설정합니다. 참조된 bean은 property가 설정될 bean의 의존성이고, 필요에 따라 property가 설정되기 전에 초기화될 것입니다. (Collaborator가 싱글톤 bean이라면 컨테이너에 의해 이미 초기화되었을 것입니다.) 모든 참조는 궁극적으로 다른 객체로의 참조입니다. Scoping과 검증은 `bean` 혹은 `parent` 속성을 통해 다른 객체의 ID 혹은 이름을 특정했냐에 따라 이루어집니다. `<ref/>` 태거의 `bean` 속성을 통해 타겟을 특정하는 것이 가장 보편된 방식이고, 같은 XML 파일 안에 있는지 따지지 않고, 동일한 컨테이너 혹은 부모 컨테이너 안의 아무 bean으로의 참조를 생성할 수 있습니다. `bean` 속성의 값은 상대 bean의 `id` 속성과 동일하거나, 상대 bean의 `name` 속성 안의 값들 중 하나와 동일할 수 있습니다. 아래의 예제는 `ref` 요소를 사용하는 방법을 보여줍니다.
+
+```xml
+<ref bean="someBean"/>
+```
+
+`parent` 속성을 통해 상대 bean을 특정하는 것은 현재 컨테이너의 부모 컨테이너 안에 있는 bean으로의 참조를 생성합니다. `parent` 속성의 값은 상대 bean의 `id` 속성과 동일하거나, 상대 bean의 `name` 속성의 값들 중 하나와 동일해야 합니다. 상대 bean은 반드시 현재 컨테이너의 부모 컨테이너 안에 있어야 합니다. 해당 변형된 참조는 컨테이너 간 계층이 있고, 부모 bean와 동일한 이름을 가지는 프록시로, 부모 컨테이너 안에 있는 이미 존재하는 bean을 감싸고 싶을때 주로 사용합니다. 아래의 두 예제는 `parent` 속성을 사용하는 방법을 보여줍니다.
+
+```xml
+<!-- 부모 컨텍스트 -->
+<bean id="accountService" class="com.something.SimpleAccountService">
+    <!-- 이곳에 의존성 주입 -->
+</bean>
+```
+
+```xml
+<!-- 자식(자손) 컨텍스트 -->
+<bean id="accountService" <!-- bean name is the same as the parent bean -->
+    class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="target">
+        <ref parent="accountService"/> <!-- 부모 bean에 참조하는 것을 확인하세요 -->
+    </property>
+    <!-- 기타 configuration과 의존성 삽입 -->
+</bean>
+```
+
+<div class="info-box" style="height: 120px;">
+    <div class="info-icon">
+        <div class="icon-div"><div class="icon"></div></div>
+    </div>
+    <div class="info-content">
+        일반적인 <code>bean</code> 참조의 값을 더이상 제공하지 않기 때문에, <code>ref</code> 요소의 <code>local</code> 속성은 4.0 beans XSD에서 더이상 지원되지 않습니다. 4.0 스키마로 업그레이드한다면 사용하던 <code>ref local</code> 참조를 <code>ref bean</code>로 변경해야 합니다.
+    </div>
+</div>
+
 #### <a name="beans-inner-beans"></a>내부 bean(inner bean)
 
 #### <a name="beans-collection-elements"></a>Collections
