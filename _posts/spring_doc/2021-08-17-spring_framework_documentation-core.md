@@ -843,7 +843,7 @@ public class ExampleBean {
 
 [이전 절](#beans-factory-collaborators)에서 언급했듯이, bean 속성과 생성자 인자를, 다른 관리되는 bean들(collaborators)로의 참조 혹은 inline 정의된 값으로써 정의할 수 있습니다. Spring의 XML 기반 구성 메타데이터는 해당 용도를 위해 자신의 `<property/>`와 `<constructor-arg/>` 요소들 속의 서브 요소 타입을 지원합니다.
 
-#### <a name="beans-value-element></a>확실한 값 (Primitives, Strings, 등...)
+#### <a name="beans-value-element"></a>확실한 값 (Primitives, Strings, 등...)
 
 `<property/>` 요소의 `value` 속성은 property 혹은 생성자 인자를 사람이 읽을 수 있는 문자열로써 특정합니다. Spring의 [conversion service](#core-convert-ConversionService-API)는 해당 값들을 `String`에서 property 혹은 인자의 실제 타입으로 변환하기 위해 사용됩니다. 아래의 예제는 다양한 값들이 설정되는 것을 보입니다.
 
@@ -968,19 +968,150 @@ Spring 컨테이너는 JavaBeans의 `PropertyEditor` 메커니즘을 사용하�
         <div class="icon-div"><div class="icon"></div></div>
     </div>
     <div class="info-content">
-        일반적인 <code>bean</code> 참조의 값을 더이상 제공하지 않기 때문에, <code>ref</code> 요소의 <code>local</code> 속성은 4.0 beans XSD에서 더이상 지원되지 않습니다. 4.0 스키마로 업그레이드한다면 사용하던 <code>ref local</code> 참조를 <code>ref bean</code>로 변경해야 합니다.
+        일반적인 <code>bean</code> 참조의 값을 더이상 제공하지 않기 때문에, <code>ref</code> 요소의 <code>local</code> 속성은 4.0 beans XSD에서 더이상 지원되지 않습니다. 4.0 스키마로 업그레이드한다면 사용하던 <code>ref local</code> 참조를 <code>ref bean</code>으로 변경해야 합니다.
     </div>
 </div>
 
 #### <a name="beans-inner-beans"></a>내부 bean(inner bean)
 
+`<property/>` 혹은 `<constructor-arg/>` 요소 안의 `<bean/>` 요소는, 아래의 예제가 보이듯이, inner bean을 정의합니다.
+
+```xml
+<bean id="outer" class="...">
+    <!-- 타겟 bean으로의 참조를 사용하는 대신에 타겟 빈을 inline에 정의해보세요 -->
+    <property name="target">
+        <bean class="com.example.Person"> <!-- 이것이 inner bean 입니다 -->
+            <property name="name" value="Fiona Apple"/>
+            <property name="age" value="25"/>
+        </bean>
+    </property>
+</bean>
+```
+
+Inner bean definition은 정의된 ID나 이름을 필요로 하지 않습니다. 만약 설정되어있더라도 컨테이너는 그 값을 식별자로써 사용하지 않습니다. 또한 컨테이너는 생성 단계에서 `scope` 플래그를 무시하는데, 이는 inner bean들은 항상 익명이고 항상 외부 bean으로 생성되기 때문입니다. Inner bean에 독립적으로 접근하거나 inner bean을 감싸고 있는 bean이 아닌 다른 collaborating bean에 주입하는 것은 불가능합니다.
+
+코너 케이스로써, 커스텀 스코프로부터 [파괴 콜백](#beans-factory-lifecycle-disposablebean)을 전달 받을 수 있습니다 - 예를 들어, 싱글톤 bean에 내장되어있는 request-scoped inner bean과 같이 말이죠. Inner bean 인스턴스의 생성은 그를 가지고 있는 bean에게 종속되어있지만, inner bean이 request scope의 생명주기에 관여하도록 파괴 콜백이 만듭니다. 이는 일반적인 상황은 아닙니다. 보편적으로 inner bean들은 그를 가지고 있는 bean의 스코프를 공유합니다.
+
 #### <a name="beans-collection-elements"></a>Collections
 
-#### <a name="beans-collection-elements-merging"></a>Collection 병합하기
+`<list/>`, `<set/>`, `<map/>`, 그리고 `<props/>`요소들은 각각 Java `Collection` 타입의 `List`, `Set`, `Map`, 그리고 `Properties`의 properties와 인자들을 설정합니다. 아래의 예제는 이를 어떻게 사용하는지를 보여줍니다.
+
+```xml
+<bean id="moreComplexObject" class="example.ComplexObject">
+    <!-- setAdminEmails(java.util.Properties) 호출의 결과 -->
+    <property name="adminEmails">
+        <props>
+            <prop key="administrator">administrator@example.org</prop>
+            <prop key="support">support@example.org</prop>
+            <prop key="development">development@example.org</prop>
+        </props>
+    </property>
+    <!-- setSomeList(java.util.List) 호출의 결과 -->
+    <property name="someList">
+        <list>
+            <value>a list element followed by a reference</value>
+            <ref bean="myDataSource" />
+        </list>
+    </property>
+    <!-- setSomeMap(java.util.Map) 호출의 결과 -->
+    <property name="someMap">
+        <map>
+            <entry key="an entry" value="just some string"/>
+            <entry key ="a ref" value-ref="myDataSource"/>
+        </map>
+    </property>
+    <!-- setSomeSet(java.util.Set) 호출의 결과 -->
+    <property name="someSet">
+        <set>
+            <value>just some string</value>
+            <ref bean="myDataSource" />
+        </set>
+    </property>
+</bean>
+```
+
+Map의 key 혹은 value, 혹은 set의 value의 값은 아래의 요소들 중 어떤 것이든 될 수 있습니다.
+
+```xml
+bean | ref | idref | list | set | map | props | value | null
+```
+
+##### <a name="beans-collection-elements-merging"></a>Collection 병합하기
+
+Spring 컨테이너는 collections의 병합 또한 지원합니다. 애플리케이션 개발자는 부모 `<list/>`, `<map/>`, `<set/>`, 혹은 `<props/>` 요소들을 정의하고 자식 `<list/>`, `<map/>`, `<set/>`, 혹은 `<props/>`요소들이 부모 요소를 상속받아 부모 collection의 값들을 override 하도록 할 수 있습니다. 즉, 자식 collection의 값들은, 부모 collection에 정의되어있는 값들을 overriding한 자식의 collection 요소들과, 부모와 자식 collections의 요소를 병합한 결과입니다.
+
+해당 병합에 관한 절은 부모-자식 bean 메커니즘에 관해 이야기합니다. 부모와 자식 bean definition에 익숙하지 않으신 분들은 이어 나가기 전에 [relevant section](#beans-child-bean-definitions)을 먼저 읽어주시기 바랍니다.
+
+아래의 예제는 collection 병합을 설명합니다.
+
+```xml
+<beans>
+    <bean id="parent" abstract="true" class="example.ComplexObject">
+        <property name="adminEmails">
+            <props>
+                <prop key="administrator">administrator@example.com</prop>
+                <prop key="support">support@example.com</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="child" parent="parent">
+        <property name="adminEmails">
+            <!-- 병합은 자식 collection definition에 정의됩니다 -->
+            <props merge="true">
+                <prop key="sales">sales@example.com</prop>
+                <prop key="support">support@example.co.uk</prop>
+            </props>
+        </property>
+    </bean>
+<beans>
+```
+
+`child` bean definition 안 `adminEmails` 속성의 `<props/>` 요소에서 `merge=true` 속성의 사용을 참고하세요. `child` bean이 컨테이너에 의해 결정되고 인스턴스화 될 때, 그 결과 인스턴스는, 자식의 `adminEmails` collection과 부모의 `adminEmails` collection을 병합한 결과를 포함하는, `adminEmails` `Properties` collection을 가지고 있습니다. 해당 결과는 아래에 나열되어있는 것과 같습니다.
+
+```
+administrator=adminsitrator@example.com
+sales=sales@example.com
+support=support@example.co.uk
+```
+
+자식 `Properties` collection의 값 집합은 부모 `<props/`으로부터 모든 property 요소들을 상속 받고, `support` 값에 대한 자식의 값은 부모 collection 안의 값을 override 합니다.
+
+해당 병합 행동은 `<list/>`, `<map/>`, 그리고 `<set/>` collection 타입들과 유사하게 적용됩니다. `<list/>` 요소의 한 예를 보자면, `List` collection 타입과 관계된 `List` collection 타입(`정렬된` 값의 collection에 대한 개념)과 관계된 코드 조각들(semantics)이 유지되었습니다. 부모의 값들은 모든 자식 리스트의 값들을 앞섭니다. `Map`, `Set`, 그리고 `Properties` collection 타입의 경우에는 정렬이 이루어지지 않습니다. 그렇기 때문에, 정렬된 코드 조각들은 컨테이너가 내부적으로 사용하는 관계된 `Map`, `Set`, 그리고 `Properties` 구현체의 기초가 되는 collection 타입들에 영향을 주지 않습니다.
 
 ##### <a name="beans-collection-merge-limitations"></a>Collection 병합의 한계
 
-##### <a name="beans-collection-elements-strongly-typed"></a>엄격하게 타입 지정된 collection
+다른 collection 타입들을 병합하는 것은 불가능합니다 (`Map`과 `List` 처럼요). 만약 이를 시도한면, 적절한 `Exception`이 던져질 것입니다. `merge` 속성은 낮은 단계의, 그리고 상속된 자식 definition에 정의되어야 합니다. `merge` 속성을 부모 collection definition에 정의하는 것은 불필요하고, 의도한 병합의 결과를 볼 수 없을 것입니다.
+
+##### <a name="beans-collection-elements-strongly-typed"></a>엄격하게 타입 지정된(Strongly-typed) collection
+
+Java 5에서 발표된 generic 타입들로 엄격하게 타입 지정된 collection들을 사용할 수 있습니다. 이는, 오로지 `String` 요소만을 가지는 (한 예시로) `Collection` 타입을 선언할 수 있다는 것입니다. Bean에 엄격하게 타입 지정된 `Collection`을 의존성 주입하기 위해 Spring을 사용한다면, `Collection`에 추가되기 전에 올바른 타입으로 변환해주는 것과 같은 Spring의 타입 변환 지원의 이점을 얻을 수 있습니다. 아래의 Java 클래스와 bean definition은 그 방법을 보입니다.
+
+```java
+public class SomeClass {
+
+    private Map<String, Float> accounts;
+
+    public void setAccounts(Map<String, Float> accounts) {
+        this.accounts = accounts;
+    }
+}
+```
+
+```xml
+<beans>
+    <bean id="something" class="x.y.SomeClass">
+        <property name="accounts">
+            <map>
+                <entry key="one" value="9.99"/>
+                <entry key="two" value="2.75"/>
+                <entry key="six" value="3.99"/>
+            </map>
+        </property>
+    </bean>
+</beans>
+```
+
+`something`의 `accounts` property가 주입되기 준비된다면, 엄격히 타입 지정된 `Map<String, Float>`의 요소 타입에 대한 generics 정보가 reflection에 의해 사용 가능해집니다. Spring의 타입 변환 infrastructure는 다양한 값 요소들이 `Float` 타입이어야 한다는 것을 알고있고, 문자열 값(`9.99`, `2.75`, `3.99`)들은 실제 `Float` 타입으로 변환됩니다.
 
 #### <a name="beans-null-element"></a>Null과 빈 문자열 값
 
