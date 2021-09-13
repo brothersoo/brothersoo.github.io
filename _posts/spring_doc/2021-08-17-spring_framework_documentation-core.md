@@ -1115,7 +1115,95 @@ public class SomeClass {
 
 #### <a name="beans-null-element"></a>Null과 빈 문자열 값
 
+Spring은 property에 `Strings`와 같은 빈 인자를 사용할 수 있도록 지원합니다. 아래의 XML 기반 구성 메타데이터 조각은 `email` property를 빈 `String` 값("")으로 설정합니다.
+
+```xml
+<bean class="ExampleBean">
+    <property name="email" value=""/>
+</bean>
+```
+
+위 예제는 아래의 Java 코드와 동일합니다.
+
+```java
+exampleBean.setEmail("");
+```
+
+`<null/>` 요소는 `null` 값을 다룹니다. 아래의 예제에서 확인할 수 있습니다.
+
+```xml
+<bean class="ExampleBean">
+    <property name="email">
+        <null/>
+    </property>
+</bean>
+```
+
+위 configuration은 아래의 Java 코드와 동일합니다.
+
+```java
+exampleBean.setEmail(null);
+```
+
 #### <a name="beans-p-namespace"></a>p-namespace를 사용한 XML 단축
+
+p-namespace는 property 값, collaborating bean 혹은 둘 다를 정의하기 위해 `bean` 요소의 속성을 사용할 수 있도록 합니다 (중첩된 `<property/>` 요소 대신에).
+
+Spring은 XML 스키마 definition을 기반으로 하는 [namespaces](#xsd-schemas)를 통해 확장 가능한 configuration 형식을 지원합니다. 이번 챕터에서 논의하는 `beans` configuration 형식은 XML Schema 문서에 정의되어있습니다. 그러나, p-namespace는 XSD 파일에 정의되어 있지 않고 Spring의 core에만 존재합니다. 아래의 예제는 동일한 결과를 가지는 두개의 XML 부분을 보여줍니다.
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="classic" class="com.example.ExampleBean">
+        <property name="email" value="someone@somewhere.com"/>
+    </bean>
+
+    <bean name="p-namespace" class="com.example.ExampleBean"
+        p:email="someone@somewhere.com"/>
+</beans>
+```
+
+해당 예제는 bean definition안의 `email`이라고 정의된 p-namespace 안의 속성을 보입니다. 이것은 Spring에게 property 선언을 포함하라고 전달합니다. 이전에 말했듯이, p-namespace는 schema definition을 가지지 않기 때문에 property 이름으로 속성의 이름을 설정할 수 있습니다.
+
+다음의 예제는 다른 bean으로의 참조를 가지는 두개의 bean definition을 포함합니다.
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="john-classic" class="com.example.Person">
+        <property name="name" value="John Doe"/>
+        <property name="spouse" ref="jane"/>
+    </bean>
+
+    <bean name="john-modern"
+        class="com.example.Person"
+        p:name="John Doe"
+        p:spouse-ref="jane"/>
+
+    <bean name="jane" class="com.example.Person">
+        <property name="name" value="Jane Doe"/>
+    </bean>
+</beans>
+```
+
+해당 예제는 p-namespace를 사용하는 property 값 뿐만이 아니라 property 참조를 선언하기 위한 특별한 형식을 사용하는 것을 포함하고 있습니다. 첫번째 bean definition이 bean `john`에서 bean `jane`으로의 참조를 생성하기 위해 `<property name="spouse" ref="jane"/>`를 사용하는 반면에, 두번째 bean definition은 완전히 동일한 동작을 위해 `p:spouse-ref="jane"`을 속성으로써 사용하고 있습니다. 해당 경우에서, `spouse`는 property 이름인 반면에, `-ref` 부분은 해당 값이 직접적인 값이 아닌 다른 bean으로의 참조라는 것을 나타냅니다.
+
+<div class="info-box" style="height: 130px">
+    <div class="info-icon">
+        <div class="icon"></div>
+    </div>
+    <div class="info-content">
+        p-namespace는 표준 XML 형식만큼 유연하지 않습니다. 예를 들어, property 참조를 선언하는 형식이 `Ref`로 끝나는 property와 충돌하는 반면에, 표준 XML 형식은 충돌하지 않습니다. 이 세가지 접근법을 동시에 사용하는 XML 문서를 생성하지 않도록 접근법을 신중하게 선택하고, 동료들과 소통하기를 권장합니다.
+    </div>
+</div>
 
 #### <a name="beans-c-namespace"></a>c-namespace를 사용한 XML 단축
 
@@ -1179,3 +1267,5 @@ public class SomeClass {
 ### <a name="core-convert-ConversionService-API"></a>3.4.4. `ConversionService` API
 
 ### <a name="aop-pfb-1"></a>6.4.1. 기초
+
+## <a name="xsd-schemas">10.1. XML Schemas
