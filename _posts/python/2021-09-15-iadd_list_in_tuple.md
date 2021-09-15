@@ -9,7 +9,7 @@ permalink: /python/:title
 
 <br>
 
-지난 포스팅에서 이해가 잘 가지 않는 현상을 발견해 궁금증을 해소해보고자 찾아보았습니다. 이해가 가지 않았던 현상은 tuple이 list type 객체를 원소로 가지고 있을 때, 해당 list type 원소에 inplace add(+= 연산)을 할 경우 error가 발생하지만, 결과적으로는 해당 원소에 붙이고자 한 값이 정상적으로 들어가는 현상입니다.
+[Mutable과 immutable에 대한 지난 포스팅](https://brothersoo.github.io/python/mutable_and_immutable_objects)에서 이해가 잘 가지 않는 현상을 발견해 궁금증을 해소해보고자 찾아보았습니다. 이해가 가지 않았던 현상은 tuple이 list type 객체를 원소로 가지고 있을 때, 해당 list type 원소에 inplace add(+= 연산)을 할 경우 error가 발생하지만, 결과적으로는 해당 원소에 붙이고자 한 값이 정상적으로 들어가는 현상입니다.
 
 ```python
 l = [1, 2, 3]
