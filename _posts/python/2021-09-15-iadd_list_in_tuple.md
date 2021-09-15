@@ -62,7 +62,7 @@ dis('t[0] += [100, 101]')
 '''
 ```
 
-첫번째 행의 1은 몇번째 줄에 대한 절차인가를 알려주는 수입니다(위 예는 한즐의 연산에 대한 분석이므로 1만 존재합니다). 두번째 행의 숫자는(0, 2, 4, ...) 해당 연산의 byte offset입니다. 두번째 행의 문자열들은 사람이 읽기 힘든 byte code를 친절하게도 사람이 읽을 수 있는 instruction으로 변환하여 나타낸 문자열입니다 (실제 바이트코드는 "\b0x\b01\a12..." 와 같이 생겼습니다). 해당 instruction들이 어떠한 작업을 하는지는 [python 공식 문서](https://docs.python.org/3/library/dis.html#python-bytecode-instructions)에 잘 작성되어있습니다.
+첫번째 행의 1은 몇번째 줄에 대한 절차인가를 알려주는 수입니다(위 예는 한줄의 연산에 대한 분석이므로 1만 존재합니다). 두번째 행의 숫자는(0, 2, 4, ...) 해당 연산의 byte offset입니다. 두번째 행의 문자열들은 사람이 읽기 힘든 byte code를 친절하게도 사람이 읽을 수 있는 instruction으로 변환하여 나타낸 문자열입니다 (실제 바이트코드는 "\b0x\b01\a12..." 와 같이 생겼습니다). 해당 instruction들이 어떠한 작업을 하는지는 [python 공식 문서](https://docs.python.org/3/library/dis.html#python-bytecode-instructions)에 잘 작성되어있습니다.
 
 CPython은 stack 기반 virtual machine을 사용합니다. 다양한 데이터들을 Instructions이 의미하는 대로 stack에 넣었다 뺐다 하며 연산을 진행할 것입니다. 위 instructions를 한줄한줄 확인해보겠습니다.
 
@@ -78,7 +78,7 @@ Instructions sequence
 
 1. **LOAD_NAME &nbsp;&nbsp;&nbsp;&nbsp; 0 (t)**\
 t라는 이름을 가지는 요소의 값을 stack에 push 합니다. Stack에 `([1, 2, 3], 4, 5)`를 push 합니다.
-2. **2 LOAD_CONST &nbsp;&nbsp;&nbsp;&nbsp; 0 (0)**\
+2. **LOAD_CONST &nbsp;&nbsp;&nbsp;&nbsp; 0 (0)**\
 0을 stack에 push 합니다.
 3. **DUP_TOP_TWO**\
 stack의 TOS와 TOS1을 복사하여 stack에 push 합니다. 이때, TOS와 TOS1의 순서가 지켜진 상태로 push됩니다.
