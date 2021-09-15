@@ -2,9 +2,9 @@
 title: "Memory allocation(1) Reference counting"
 categories:
   - Python
-  - Memory allocation
 tags:
   - Python
+  - Memory allocation
 permalink: /python/:title
 ---
 \
