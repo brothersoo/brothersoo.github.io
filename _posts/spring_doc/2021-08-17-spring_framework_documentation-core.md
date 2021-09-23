@@ -55,7 +55,7 @@ permalink: /spring_doc/:title
 
 <br>
 
-해당 포스트는 spring에 대한 이해 및 영어 공부를 위해 [spring framework의 공식 문서 v5.3.9](https://docs.spring.io/spring-framework/docs/current/reference/html/)를 번역한 포스팅입니다.
+해당 포스트는 spring에 대한 이해 및 영어 공부를 위해 [spring framework의 공식 문서 v5.3.9](https://docs.spring.io/spring-framework/docs/5.3.9/reference/html/)를 번역한 포스팅입니다.
 
 오역이 많을 수 있으니 발견하신다면 댓글로 말씀 부탁드리겠습니다 감사합니다!
 
@@ -1207,7 +1207,69 @@ Spring은 XML 스키마 definition을 기반으로 하는 [namespaces](#xsd-sche
 
 #### <a name="beans-c-namespace"></a>c-namespace를 사용한 XML 단축
 
+[p-namespace를 사용한 XML 단축](#beans-p-namespace)과 비슷하게, Spring 3.1에서 소개된 c-namespace는, 생성자 인자를 구성하기 위해, 중첩된 `constructor-arg` 대신, 인라인 속성을 사용할 수 있게 합니다.
+
+아래의 예제는 [생성자 기반 의존성 주입](#beans-constructor-injection)과 동일한 기능을 사용하기 위해 `c:` namespace를 사용합니다.
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="beanTwo" class="x.y.ThingTwo"/>
+    <bean id="beanThree" class="x.y.ThingThree"/>
+
+    <!-- 선택적인 인자 이름을 가지는 전통적인 선언 -->
+    <!-- traditional declaration with optional argument names -->
+    <bean id="beanOne" class="x.y.ThingOne">
+        <constructor-arg name="thingTwo" ref="beanTwo"/>
+        <constructor-arg name="thingThree" ref="beanThree"/>
+        <constructor-arg name="email" value="something@somewhere.com"/>
+    </bean>
+
+    <!-- 인자 이름을 가지는 c-namespace 선언 -->
+    <bean id="beanOne" class="x.y.ThingOne" c:thingTwo-ref="beanTwo"
+        c:thingThree-ref="beanThree" c:email="something@somewhere.com"/>
+
+</beans>
+```
+
+`c:` namespace는 생성자 인자를 그들의 이름을 통해 설정하는, `p:`와 동일한 규칙(bean 참조에 `-ref` 꼬리를 사용하는)을 사용합니다. 비슷하게도, 해당 규칙은 XSD 스키마(Spring core에 위치하는)에 정의되어있지 않음에도 불구하고 XML 파일에 선언되어야 합니다.
+
+생성자 인자들의 이름이 유효하지 않은 흔치 않은 상황에서는(대게 디버깅 정보 없이 바이트코드가 컴파일 되었을 때), 다음과 같이 인자 인덱스에 fallback을 사용할 수 있습니다.
+
+```xml
+<!-- c-namespace 인덱스 선언 -->
+<bean id="beanOne" class="x.y.ThingOne" c:_0-ref="beanTwo" c:_1-ref="beanThree"
+    c:_2="something@somewhere.com"/>
+```
+
+<div class="info-box" style="height: 140px">
+    <div class="info-icon">
+        <div class="icon"></div>
+    </div>
+    <div class="info-content">
+        XML 문법에 따르면, XML 속성 이름들은 숫자로 시작할 수 없기 때문에(몇몇 IDE들은 허용함에도 불구하고), 인덱스 표기에는 앞선 <code>_</code>를 필요로 합니다. 해당 인덱스 표기는 <code>&lt;constructor-arg&gt;</code>에도 사용 가능하지만, 대개 순차적인 선언만으로도 충분하기 때문에 보통 사용되지 않습니다.
+    </div>
+</div>
+
+<br>
+
+실제로, 생성자 해결 [메커니즘](#beans-factory-ctor-arguments-resolution)은 인자 매칭에 꽤나 효과적이기 때문에 configuration에서 전반적으로 이름 표기법(name notation)을 사용하기를 권장합니다.
+
 #### <a name="beans-compound-property-names"></a>혼합 property 이름
+
+마지막 property를 제외한 다른 모든 요소들이 `null`이 아닌 이상, bean properties를 설정할 때, 혼합되거나 중첩된 property 이름을 사용할 수 있습니다. 아래의 bean definition을 확인해보세요:
+
+```xml
+<bean id="something" class="things.ThingOne">
+    <property name="fred.bob.sammy" value="123" />
+</bean>
+```
+
+`something` bean은, `123`이라는 값으로 설정된 `sammy` property를 가지는, `bob` property를 가지는, `fred` property를 가지고 있습니다. 이것이 동작하기 위해서는, bean이 생성된 이후에, `something`의 property `fred`와 `fred`의 `bob` property는 `null`이어서는 안됩니다. 그렇지 않다면, `NullPointException`이 발생할 것입니다.
 
 ### <a name="beans-factory-dependson"></a>1.4.3. `depends-on` 사용하기
 
