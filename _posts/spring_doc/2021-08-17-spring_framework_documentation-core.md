@@ -55,7 +55,7 @@ permalink: /spring_doc/:title
 
 <br>
 
-해당 포스트는 spring에 대한 이해 및 영어 공부를 위해 [spring framework의 공식 문서 v5.3.9](https://docs.spring.io/spring-framework/docs/5.3.9/reference/html/)를 번역한 포스팅입니다.
+해당 포스트는 spring에 대한 이해 및 영어 공부를 위해 [spring framework의 공식 문서 v5.3.9](https://docs.spring.io/spring-framework/docs/5.3.9/reference/html/core.html#spring-core)를 번역한 포스팅입니다.
 
 오역이 많을 수 있으니 발견하신다면 댓글로 말씀 부탁드리겠습니다 감사합니다!
 
@@ -316,7 +316,7 @@ XML 기반 구성 메타데이터에서, `id` 속성, `name` 속성, 혹은 둘 
         <div class="icon"></div>
     </div>
     <div class="info-content">
-        Classpath에서 component scanning이 진행될 때, Spring은 이전에 설명된 규칙을 가지고 이름없는 components의 이름을 생성합니다: simple class name의 첫 알파벳만 소문자로 변경한 것. 하지만, (보통 일어나지 않는) 하나 이상의 문자를 가지고, 첫번째와 두번째 문자들이 모두 대문자인 특별한 상황에서는 원래의 대소문자 형식이 유지됩니다. 이는 `java.beans.Introspector.decapitalize`에서 정의된 규칙과 동일합니다 (Spring이 여기서 사용하는 것과).
+        Classpath에서 component scanning이 진행될 때, Spring은 이전에 설명된 규칙을 가지고 이름없는 components의 이름을 생성합니다: simple class name의 첫 알파벳만 소문자로 변경한 것. 하지만, (보통 일어나지 않는) 하나 이상의 문자를 가지고, 첫번째와 두번째 문자들이 모두 대문자인 특별한 상황에서는 원래의 대소문자 형식이 유지됩니다. 이는 <code>java.beans.Introspector.decapitalize</code>에서 정의된 규칙과 동일합니다 (Spring이 여기서 사용하는 것과).
     </div>
 </div>
 
@@ -484,7 +484,7 @@ public class DefaultServiceLocator {
         <div class="icon"></div>
     </div>
     <div class="info-content">
-        Spring 문서에서 "factory bean"이란, Spring 컨테이너에서 구성되고, 인스턴스, 혹은 정적 팩토리 메서드를 통해 객체를 생성하는 bean을 뜻합니다. 이에 반해, `FactoryBean`(대문자에 유의하세요)는 Spring-specific `FactoryBean`구현체 클래스를 나타냅니다.
+        Spring 문서에서 "factory bean"이란, Spring 컨테이너에서 구성되고, 인스턴스, 혹은 정적 팩토리 메서드를 통해 객체를 생성하는 bean을 뜻합니다. 이에 반해, <code>FactoryBean</code>(대문자에 유의하세요)는 Spring-specific <code>FactoryBean</code>구현체 클래스를 나타냅니다.
     </div>
 </div>
 
@@ -1273,6 +1273,33 @@ Spring은 XML 스키마 definition을 기반으로 하는 [namespaces](#xsd-sche
 
 ### <a name="beans-factory-dependson"></a>1.4.3. `depends-on` 사용하기
 
+어떠한 bean이 다른 bean을 의존하고 있다는 것은 대개 한 bean이 다른 bean의 속성으로써 설정되어있음을 의미합니다. 이것은 일반적으로 XML 기반의 configuration 메타데이터 안의 [`<ref/>` 속성](#beans-ref-element)을 통해 설정됩니다. 그러나 가끔 bean 간의 의존성은 조금 직접적이지 않을 수 있습니다. 데이터베이스 드라이버 등록과 같이 클래스 안의 정적 초기화 객체(initializer)가 발동해야 하는 상황을 예로 들 수 있습니다. `depends-on` 속성은 하나 이상의 bean들이 해당 bean을 사용하는 bean이 초기화 되기 전에 초기화되도록 확실히 강제할 수 있습니다. 아래의 예제는 단일 bean의 의존성을 표현하기 위해 `depends-on` 속성ㅇ르 사용합니다:
+
+```xml
+<bean id="beanOne" class="ExampleBean" depends-on="manager"/>
+<bean id="manager" class="ManagerBean" />
+```
+
+다수의 bean들의 의존성을 표현하기 위해서는 `depends-on` 속성의 값으로써 bean 이름 리스트를 제공하세요.(유효한 구분자는 쉼표, 공백, 그리고 세미콜론입니다.)
+
+```xml
+<bean id="beanOne" class="ExampleBean" depends-on="manager,accountDao">
+    <property name="manager" ref="manager" />
+</bean>
+
+<bean id="manager" class="ManagerBean" />
+<bean id="accountDao" class="x.y.jdbc.JdbcAccountDao" />
+```
+
+<div class="info-box" style="height: 150px">
+    <div class="info-icon">
+        <div class="icon"></div>
+    </div>
+    <div class="info-content">
+        <code>depends-on</code> 속성은 초기화 시간 단계(initialization-time) 의존성과, <a href="#beans-factory-scopes-singleton">싱글톤</a> bean들만을 위한, 대응하는 파괴 시간 단계(corresponding destruction-time) 의존성, 두가지 단계 모두 지정할 수 있습니다. 주어진 bean으로 <code>depends-on</code> 관계를 정의하는 의존되는 bean들은 주어진 bean 보다 우선적으로 파괴됩니다. 그러나, <code>depends-on</code>은 셧다운 순서 또한 조정할 수 있습니다.
+    </div>
+</div>
+
 ### <a name="beans-factory-lazy-init"></a>1.4.4 Lazy-initialized Beans (지연 초기화)
 
 ### <a name="beans-factory-autowire"></a>1.4.5. Autowiring Collaborators
@@ -1281,7 +1308,7 @@ Spring은 XML 스키마 definition을 기반으로 하는 [namespaces](#xsd-sche
 
 ## <a name="beans-factory-scopes"></a>1.5. Bean Scopes (Bean 영역)
 
-### 1.5.1. The Singleton Scope (싱글톤 영역)
+### <a name="beans-factory-scopes-singleton"></a>1.5.1. The Singleton Scope (싱글톤 영역)
 
 ### 1.5.2. The Prototype Scope (프로토타입 영역)
 
