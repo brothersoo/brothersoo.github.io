@@ -10,6 +10,12 @@ permalink: /database/:title
 toc:
     true
 ---
+<style>
+    img {
+        wid
+    }
+</style>
+
 
 <br>
 <br>
@@ -46,11 +52,11 @@ B tree family들에 해대 이야기 하기 전, 데이터베이스와 관련된
 
 디스크는 데이터를 원판에 저장하고 원판을 돌리며 arm의 head가 위치한 점의 데이터를 읽는 형식으로 데이터를 읽습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i1_disk.png)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i1_disk.png" width="70%" height="70%">
 
 디스크 구조의 간단한 개념과 용어만 짚고 넘어가겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i2_sector,track,block,offset.png)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i2_sector,track,block,offset.png">
 
 하나의 원판은 sector 라는 개념적인 부분과 track이라는 물리적인 부분으로 구성되어있습니다.
 
@@ -77,7 +83,7 @@ B tree family들에 해대 이야기 하기 전, 데이터베이스와 관련된
 
 다음과 같은 구조를 가지는 Employee 테이블을 만들겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/t1_Employee_table.png)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/t1_Employee_table.png" width="50%" height="50%">
 
 이 테이블에 저장될 하나의 row는 128B(10+50+10+8+50)의 크기를 차지할 것입니다.
 
@@ -89,7 +95,7 @@ Block의 크기는 512B이므로 하나의 block에는 총 네개(512/128)의 re
 
 다음과 같이 Employee 테이블에 100개의 row가 저장되어 있다고 하겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/t2_100_employees.png)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/t2_100_employees.png" width="50%" height="50%">
 
 그렇다면 해당 테이블의 데이터들은 총 25개(100/4)의 block을 차지하고 있는 셈입니다.
 
@@ -213,7 +219,7 @@ M-way Search Tree는 치명적인 약점이 있습니다.
 
 빈 10-way Search Tree에 10, 20, 30이라는 데이터를 순차적으로 넣겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i10_10-way_Search_Tree(1).png)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i10_10-way_Search_Tree(1).png" width="50%" height="50%">
 
 10을 삽입하였습니다.
 
@@ -229,7 +235,7 @@ M-way Search Tree는 치명적인 약점이 있습니다.
 
 아래와 같이 하나의 노드에 10, 20, 30 데이터를 모두 넣는 것이 효율적이지만, M-way Search Tree는 구조를 생성하는데 아무런 제약조건이 없으므로 위 구조도 문제 없는 M-way Search Tree입니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i13_efficient_10-way_Search_Tree.png)
+<img src="{{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i13_efficient_10-way_Search_Tree.png" width="70%" height="70%">
 
 불필요하게 자식 노드를 생성하여 깊이가 늘어가고, 탐색 속도에도 큰 영향을 끼치게 될 것입니다.
 
