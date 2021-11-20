@@ -46,11 +46,11 @@ B tree family들에 해대 이야기 하기 전, 데이터베이스와 관련된
 
 디스크는 데이터를 원판에 저장하고 원판을 돌리며 arm의 head가 위치한 점의 데이터를 읽는 형식으로 데이터를 읽습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree(1)_B-Tree&B+Tree/i1_disk.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i1_disk.png)
 
 디스크 구조의 간단한 개념과 용어만 짚고 넘어가겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree(1)_B-Tree&B+Tree/i2_sector,track,block,offset.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i2_sector,track,block,offset.png)
 
 하나의 원판은 sector 라는 개념적인 부분과 track이라는 물리적인 부분으로 구성되어있습니다.
 
@@ -77,19 +77,19 @@ B tree family들에 해대 이야기 하기 전, 데이터베이스와 관련된
 
 다음과 같은 구조를 가지는 Employee 테이블을 만들겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/t1_Employee_table.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/t1_Employee_table.png)
 
 이 테이블에 저장될 하나의 row는 128B(10+50+10+8+50)의 크기를 차지할 것입니다.
 
 앞서 디스크는 block으로 이루어져있다고 했는데, 이 block의 크기가 512B 라고 가정해보겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i3_four_records_in_a_block.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i3_four_records_in_a_block.png)
 
 Block의 크기는 512B이므로 하나의 block에는 총 네개(512/128)의 record가 저장될 수 있습니다.
 
 다음과 같이 Employee 테이블에 100개의 row가 저장되어 있다고 하겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/t2_100_employees.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/t2_100_employees.png)
 
 그렇다면 해당 테이블의 데이터들은 총 25개(100/4)의 block을 차지하고 있는 셈입니다.
 
@@ -97,7 +97,7 @@ Block의 크기는 512B이므로 하나의 block에는 총 네개(512/128)의 re
 
 25개의 block을 모두 탐색하지 않고 더 적은 수의 block을 탐색하기 위해 생긴 것이 index 입니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i4_dense_index_table.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i4_dense_index_table.png)
 
 eid를 인덱스로 설정한다면 인덱스 테이블에는 eid와 포인터가 저장됩니다.
 
@@ -138,7 +138,7 @@ eid를 인덱스로 설정한다면 인덱스 테이블에는 eid와 포인터�
 
 이를 multi-level index라고 합니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i5_multi-level_index.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i5_multi-level_index.png)
 
 실제 데이터 레코드를 가리키는 인덱스를 1차 인덱스, 1차 인덱스를 가리키는 인덱스를 2차 인덱스라고 하겠습니다.(1차, 2차 인덱스는 실제로 사용되는 용어가 아니고 설명의 용이를 위해 만들어낸 용어입니다.)
 
@@ -165,7 +165,7 @@ eid를 인덱스로 설정한다면 인덱스 테이블에는 eid와 포인터�
 
 M-way Search Tree에 대해 이야기 하기 전에 잠깐 Binary Search Tree(이하 BST)에 대해 이야기해보겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i6_BST.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i6_BST.png)
 
 위와 같이 부모 노드보다 작은 값은 부모 노드의 왼쪽에, 부모 노드보다 큰 값은 부모 노드의 오른쪽에 위치한 트래 구조를 BST 라고 합니다.
 
@@ -181,7 +181,7 @@ M-way Search Tree는 하나의 노드당 최대 M-1개의 데이터를 가질 �
 
 부모 노드에 10, 20 이 저장되어있는 3-way Search Tree를 생각해보겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i7_3-way_Search_Tree.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i7_3-way_Search_Tree.png)
 
 10보다 작은 데이터는 첫번째 자식 노드에, 10보다 크고 20보다 작은 데이터는 두번째 자식 노드에, 20보다 큰 데이터는 세번째 자식 노드에 저장됩니다.
 
@@ -191,7 +191,7 @@ M-way Search Tree는 하나의 노드당 최대 M-1개의 데이터를 가질 �
 
 4-way Search Tree를 사용한 예시를 확인해보겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i8_4-way_Search_Tree.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i8_4-way_Search_Tree.png)
 
 이처럼 하나의 노드에는 세개(M-1)의 인덱스가 저장되고, 네개(M)의 자식 포인터가 있습니다.
 
@@ -199,7 +199,7 @@ M-way Search Tree는 하나의 노드당 최대 M-1개의 데이터를 가질 �
 
 즉, 세개의 인덱스가 가리키는 데이터 레코드의 포인터 또한 가지고 있어야 합니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i9_with_record_pointer.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i9_with_record_pointer.png)
 
 위 노드 형태가 M-way Search Tree 노드의 형태이고, 이후 확인할 B-Tree의 형태이기도 합니다.
 
@@ -213,15 +213,15 @@ M-way Search Tree는 치명적인 약점이 있습니다.
 
 빈 10-way Search Tree에 10, 20, 30이라는 데이터를 순차적으로 넣겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i10_10-way_Search_Tree(1).png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i10_10-way_Search_Tree(1).png)
 
 10을 삽입하였습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i11_10-way_Search_Tree(2).png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i11_10-way_Search_Tree(2).png)
 
 20은 10보다 큰 값이니 10 오른쪽의 포인터가 가리키는 자식 노드를 만들고 20을 넣었습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i12_10-way_Search_Tree(3).png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i12_10-way_Search_Tree(3).png)
 
 30 역시 20보다 큰 값이므로 20 오른쪽의 포인터가 가리키는 자식 노드를 만들고 30을 넣었습니다.
 
@@ -229,7 +229,7 @@ M-way Search Tree는 치명적인 약점이 있습니다.
 
 아래와 같이 하나의 노드에 10, 20, 30 데이터를 모두 넣는 것이 효율적이지만, M-way Search Tree는 구조를 생성하는데 아무런 제약조건이 없으므로 위 구조도 문제 없는 M-way Search Tree입니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i13_efficient_10-way_Search_Tree.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i13_efficient_10-way_Search_Tree.png)
 
 불필요하게 자식 노드를 생성하여 깊이가 늘어가고, 탐색 속도에도 큰 영향을 끼치게 될 것입니다.
 
@@ -263,23 +263,23 @@ M-way Search Tree가 B-Tree가 되기 위해 필요한 조건은 다음과 같�
 
 4차 B-Tree에 10, 20, 40, 50을 순차적으로 삽입해보겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i14_self_balancing(1).png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i14_self_balancing(1).png)
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i15_self_balancing(2).png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i15_self_balancing(2).png)
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i16_self_balancing(3).png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i16_self_balancing(3).png)
 
 이처럼 self balancing 기능이 있는 B-Tree는 인덱스를 관리하는데 안성맞춤입니다.
 
 이전에 보았던 M-way Search Tree의 노드 형태를 다시 확인해보겠습니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i18_M-way_Search_Tree_node.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i18_M-way_Search_Tree_node.png)
 
 이와 같이 노드에는 M-1개의 데이터(인덱스)가 있고, 해당 인덱스가 가리키는 실제 레코드 포인터가 존재합니다.
 
 B-Tree의 모든 노드들은 아래의 이미지와 같이 데이터 레코드를 가리키는 포인터를 가지고 있는 셈입니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i7_B-Tree_record_pointer.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i7_B-Tree_record_pointer.png)
 
 앞서 보았던 multi-level index의 dense함과는 거리가 있는 sparse함이 보이지만, B-Tree는 인덱스 레코드와 데이터 레코드를 따로 관리하는 non-clustered index 구조에 사용되는 자료구조입니다.
 
@@ -296,13 +296,13 @@ B+Tree 또한 B-Tree와 동일한 구조를 가지고 있습니다.
 
 결국 B+Tree는 리프 노드에 모든 인덱스를 가지고 있어야 하므로, 부모 노드의 데이터들이 모두 리프 노드들에 포함되어 있어야 합니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i19_B+Tree.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i19_B+Tree.png)
 
 또한, B+Tree의 모든 leaf 노드는 linked list 구조로 되어있습니다.
 
 Leaf 노드의 인덱스들은 모든 인덱스들이므로 dense한 index 형태를 가집니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/index(1)_B-Tree&B+Tree/i20_linked_leaf_node_list.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i20_linked_leaf_node_list.png)
 
 그토록 찾던 multi-level index와 동일한 형태를 띄고 있는 것을 확인할 수 있습니다.
 
