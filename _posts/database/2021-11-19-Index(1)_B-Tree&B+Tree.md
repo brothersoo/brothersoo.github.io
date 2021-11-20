@@ -10,12 +10,6 @@ permalink: /database/:title
 toc:
     true
 ---
-<style>
-    img {
-        wid
-    }
-</style>
-
 
 <br>
 <br>
@@ -257,7 +251,7 @@ B-Tree의 모든 노드들은 아래의 이미지와 같이 데이터 레코드�
 
 ![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i7_B-Tree_record_pointer.png)
 
-앞서 보았던 multi-level index의 dense함과는 거리가 있는 sparse함이 보이지만, B-Tree는 인덱스 레코드와 데이터 레코드를 따로 관리하는 non-clustered index 구조에 사용되는 자료구조입니다.
+앞서 보았던 multi-level index의 dense함과는 거리가 있는 sparse함이 보이지만, B-Tree는 index 관리에 사용되는 자료구조입니다.
 
 <br>
 <br>
@@ -284,14 +278,14 @@ Leaf 노드의 인덱스들은 모든 인덱스들이므로 dense한 index 형�
 
 Leaf 노드들은 multi-level index에서의 1차 인덱스, 위의 레벨 노드들은 2차, 3차,... 인덱스가 되는 것입니다.
 
-이 B+Tree는 clustered index 구조에 사용되는 자료구조입니다.
+대부분의 RDBMS들이 이 B+Tree를 인덱스 구조에 사용하고 있습니다.
 
 <br>
 <br>
 
 # Clustered index & Non-clustered index
 
-다음 포스트에서는 B+Tree와 B-Tree로 구현되는 clustered index와 non-clustered index의 특징과 차이점을 정리해보겠습니다.
+다음 포스트에서는 B Tree 계열로 구현하는 clustered index와 non-clustered index의 특징과 차이점을 정리해보겠습니다.
 
 <br>
 <br>
