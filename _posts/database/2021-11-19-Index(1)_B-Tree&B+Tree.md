@@ -249,7 +249,7 @@ M-way Search Tree가 B-Tree가 되기 위해 필요한 조건은 다음과 같�
 
 B-Tree의 모든 노드들은 아래의 이미지와 같이 데이터 레코드를 가리키는 포인터를 가지고 있는 셈입니다.
 
-![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i7_B-Tree_record_pointer.png)
+![]({{ site.url }}{{ site.baseurl }}/assets/images/database/Index(1)_B-Tree&B+Tree/i17_B-Tree_record_pointer.png)
 
 앞서 보았던 multi-level index의 dense함과는 거리가 있는 sparse함이 보이지만, B-Tree는 index 관리에 사용되는 자료구조입니다.
 
