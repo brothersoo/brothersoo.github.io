@@ -7,8 +7,6 @@ tags:
     - database
     - computer structure
 permalink: /database/:title
-toc:
-    true
 ---
 
 <br>
