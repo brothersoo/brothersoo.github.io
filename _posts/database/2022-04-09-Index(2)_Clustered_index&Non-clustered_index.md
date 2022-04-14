@@ -28,8 +28,6 @@ permalink: /database/:title
 
 삭제 시에는 해당 row의 인덱스를 사용하지 않음 처리하고, 수정 시에는 해당 row의 인덱스를 사용하지 않음 처리 후, 새로운 인덱스를 생성합니다. 결국 쌓이는 인덱스의 양이 커져 사용되지 않는 인덱스는 바로 제거해 주는 것이 좋습니다.
 
-## Index가 사용되지 않는 
-
 # Clustered Index
 
 각 InnoDB 테이블은 clustered index라는 row 데이터를 저장하는 특별한 index를 가집니다. 보통, clustered index는 primary key와 동일합니다.
